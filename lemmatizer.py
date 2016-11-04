@@ -48,3 +48,5 @@ if __name__ == '__main__':
 	print ml.lemmatize("surprising")
 	print ml.lemmatize("admirable")
 	print ml.lemmatize("interesting")
+
+	print ml.lemmatize("anti-american",'n')

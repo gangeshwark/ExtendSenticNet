@@ -18,30 +18,105 @@ import random
 from lemmatizer import MyLemmatizer
 from semantic_similarity import SemanticSimilarity
 import operator
+from senticnet4_data import senticnet
 
 def preprocess(word):
 	"""Function to lemmatize a word
 		1. Remove plurals
 		2. Remove verb inflictions
-		3. Remove prepositions
-		4. Remove conjunctions
-		5. Remove Foriegn Language
+		3. Remove negation
+		4. Remove prepositions
+		5. Remove conjunctions
+		6. Remove Foriegn Language
 	"""
 	pass
 
 
 def get_new_concepts():
-	"""Extracts new concepts using SenticWordNet(SWN) and Bing Liu's Opinion lexicon.
+	"""Extracts new concepts using SentiWordNet(SWN) and Bing Liu's Opinion lexicon.
 
 	Arguments:
 
 	Returns:
 		List of new concepts
 	"""
-	neg_words, pos_words = [], []
+	current_concepts = [key for (key, value) in senticnet.iteritems()]
+	print current_concepts[:10]
+	bing_negative_words = []
+	bing_positive_words = []
+
+	swn_negative_words = []
+	swn_positive_words = []
+	new_neg_words, new_pos_words = [], []
 	#Section 1: code to extract from SWN.
 	#Call preprocess for every word encountered.
-	return neg_words, pos_words
+	print "Extracting from SWN"
+	swn_all_words = swn.all_senti_synsets()
+	for word in swn_all_words:
+		word_name = word.synset.name().split('.')[0]
+		if word.pos_score() > word.neg_score():
+			swn_positive_words.append(word_name)
+		else:
+			swn_negative_words.append(word_name)
+
+	
+
+	#include only if they are not available in knowledge base of senticnet
+	print "Checking SenticNet..."
+	"""
+	for x in xrange(len(swn_positive_words)):
+		if swn_positive_words[x] not in current_concepts:
+			new_pos_words.append(swn_positive_words[x])
+
+	for x in xrange(len(swn_negative_words)):
+		if swn_negative_words[x] not in current_concepts:
+			new_neg_words.append(swn_negative_words[x])
+	"""
+	print "Positive Words"
+	new_pos_words = list(set(swn_positive_words)-set(current_concepts))
+	print "Negative Words"
+	new_neg_words = list(set(swn_negative_words)-set(current_concepts))
+	print "Sample SWN: Length: ", len(new_pos_words), len(new_neg_words)
+	print new_pos_words[:10]
+	print new_neg_words[:10]
+	
+	#Section 2: code to extract concepts from Bing Liu's Opinion lexicon.
+	print "Extracting from Bing Liu"
+	with open("data/bingliu_lexicon/positive-words.txt", 'r') as bing_pos_file:
+		for line in bing_pos_file:
+			w = preprocess(line)
+			bing_positive_words.append(w)
+
+	with open("data/bingliu_lexicon/negative-words.txt", 'r') as bing_neg_file:
+		for line in bing_neg_file:
+			w = preprocess(line)
+			bing_negative_words.append(w)
+	
+	#include only if they are not available in knowledge base of senticnet
+	print "Checking SenticNet..."
+	"""
+	for x in xrange(len(bing_positive_words)):
+		if bing_positive_words[x] not in current_concepts:
+			new_pos_words.append(bing_positive_words[x])
+
+	for x in xrange(len(bing_negative_words)):
+		if bing_negative_words[x] not in current_concepts:
+			new_neg_words.append(bing_negative_words[x])
+	"""
+	#unique concepts
+	print "Positive Words"
+	bing_new_pos_words = list(set(bing_positive_words)-set(current_concepts))
+	print "Negative Words"
+	bing_new_neg_words = list(set(bing_negative_words)-set(current_concepts))
+
+	print "Sample Bing Liu: Length: ", len(bing_new_pos_words), len(bing_new_neg_words)
+	print bing_new_pos_words
+	print bing_new_neg_words
+
+	new_pos_words+=bing_new_pos_words
+	new_neg_words+=bing_new_neg_words
+
+	return new_pos_words, new_neg_words
 
 
 def get_random_moodtags(polarity):
@@ -126,16 +201,20 @@ def get_semantics(word):
 
 
 def main():
-	neg_words, pos_words = get_new_concepts()
+	pos_words, neg_words = get_new_concepts()
+	#print 
+	print pos_words[:20]
+	print neg_words[:20]
 	neg_words = ["concerns", "negatives"]
 	pos_words = ["achievements", "revelation"]
-	for word in neg_words:
-		print word
-		print get_relevant_moodtags(word, -1)[:2]
-		
+	
 	for word in pos_words:
 		print word
 		print get_relevant_moodtags(word, 1)[:2]
+
+	for word in neg_words:
+		print word
+		print get_relevant_moodtags(word, -1)[:2]
 
 
 if __name__ == '__main__':

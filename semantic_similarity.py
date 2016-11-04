@@ -1,3 +1,11 @@
+'''
+    File name: semantic_similarity.py
+    Author: Gangeshwar Krishnamurthy
+    Email: gangeshwark@gmail.com
+    Date created: 11/04/2016
+    Python Version: 2.7
+'''
+
 from __future__ import division
 import nltk
 from nltk.corpus import wordnet as wn
