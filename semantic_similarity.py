@@ -18,6 +18,10 @@ import sys
 # The code is based on the paper https://www.researchgate.net/publication/232645326_Sentence_Similarity_Based_on_Semantic_Nets_and_Corpus_Statistics
 
 # Latest work: http://sujitpal.blogspot.in/2016/09/sentence-similarity-using-recursive.html
+'''
+I'm still exploring other algorithms for semantic similarity. Comment your suggestions.
+
+'''
 
 # Parameters to the algorithm. Currently set to values that was reported
 # in the paper to produce "best" results.
@@ -35,7 +39,6 @@ class SemanticSimilarity(object):
 		self.N = 0
 
 	######################### word similarity ##########################
-
 	def get_best_synset_pair(self, word_1, word_2):
 	    """ 
 	    Choose the pair with highest path similarity among all pairs. 

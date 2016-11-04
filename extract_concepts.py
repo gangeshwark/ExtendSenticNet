@@ -20,6 +20,14 @@ from semantic_similarity import SemanticSimilarity
 import operator
 from senticnet4_data import senticnet
 
+CURRENT_SENTICNET_DATA_PATH = 'data/current_senticnet_kb'
+BING_LIU_DATA_PATH = 'data/bingliu_lexicon'
+OUTPUT_BASE_PATH = 'data/new_data'
+
+SS = SemanticSimilarity()
+current_pos_concepts = [key for (key, value) in senticnet.iteritems() if value[6]=='positive']
+current_neg_concepts = [key for (key, value) in senticnet.iteritems() if value[6]=='negative']
+
 def preprocess(word):
 	"""Function to lemmatize a word
 		1. Remove plurals
@@ -82,12 +90,12 @@ def get_new_concepts():
 	
 	#Section 2: code to extract concepts from Bing Liu's Opinion lexicon.
 	print "Extracting from Bing Liu"
-	with open("data/bingliu_lexicon/positive-words.txt", 'r') as bing_pos_file:
+	with open(BING_LIU_DATA_PATH + "/positive-words.txt", 'r') as bing_pos_file:
 		for line in bing_pos_file:
 			w = preprocess(line)
 			bing_positive_words.append(w)
 
-	with open("data/bingliu_lexicon/negative-words.txt", 'r') as bing_neg_file:
+	with open(BING_LIU_DATA_PATH + "/negative-words.txt", 'r') as bing_neg_file:
 		for line in bing_neg_file:
 			w = preprocess(line)
 			bing_negative_words.append(w)
@@ -144,7 +152,7 @@ def get_random_moodtags(polarity):
 
 # This code returns almost 0 for all the values
 def get_relevant_moodtags(word, polarity):
-	SS = SemanticSimilarity()
+
 	positive_moodtags = ['joyful', 'interesting', 'surprising', 'admirable']
 	negative_moodtags=['sad','scared','angry','disgusting']
 	
@@ -182,10 +190,10 @@ def get_relevant_moodtags(word, polarity):
 		mood_sorted = reversed(mood_sorted)
 		mood_sorted = list(mood_sorted)
 		
-	return mood_sorted
+	return mood_sorted[:2]
 
 
-def get_semantics(word):
+def get_semantics(word, polarity):
 	"""
 	Returns a list of words which are closely related to the given concept. 
 	All 5 semantics will have same polarity as the input concept.
@@ -194,27 +202,93 @@ def get_semantics(word):
 		word: the word to find the semantics for.
 
 	Returns:
-		a 5-value list of semantics. 
+		a 5-value list of semantics.
 	"""
-	semantics = []
+
+	'''
+	Observation:
+		Observing the SenticNet data, I found that the semantically related words/concepts for a word/concepts is from 
+		the same set of data available in SenticNet.
+		This can also be thought of intuitively when we want to relation between words/concepts using graph.
+	'''
+	#seperate positive concepts and negative concepts from the SenticNet data 
+	#to ensure we don't relate concepts with different polarity
+	if polarity == 1:
+		rank = {}
+		print "POL: 1", word
+		for concept in current_pos_concepts:
+			rank[concept] = SS.word_similarity(word, concept)
+
+		#sort in the descending order of scores of the similarity
+		rank = sorted(rank.items(), key=operator.itemgetter(1))
+		rank = reversed(rank)
+		rank = list(rank)[:5]
+	
+
+	else:
+		rank = {}
+		print "POL: -1", word
+		for concept in current_neg_concepts:
+			rank[concept] = SS.word_similarity(word, concept)
+
+		#sort in the descending order of scores of the similarity
+		rank = sorted(rank.items(), key=operator.itemgetter(1))
+		rank = reversed(rank)
+		rank = list(rank)[:5]
+
+	print rank
+
+	semantics = ['semantic1', 'semantic2', 'semantic3', 'semantic4', 'semantic5']
 	return semantics
 
 
 def main():
-	pos_words, neg_words = get_new_concepts()
-	#print 
-	print pos_words[:20]
-	print neg_words[:20]
+	pos_words, neg_words = [],[]
+	#pos_words, neg_words = get_new_concepts()
+
 	neg_words = ["concerns", "negatives"]
 	pos_words = ["achievements", "revelation"]
+	#Every key in the dictionary is a new concept and the value is a 8-value list with the format as below
+	#[#mood_tag1, #mood_tag2, polarity, semantic1, semantic2, semantic3, semantic4, semantic5]
 	
+	senticvector = {}
 	for word in pos_words:
-		print word
-		print get_relevant_moodtags(word, 1)[:2]
+		final_moods = []
+		final_semantic = []
+		concept_moodtags = get_relevant_moodtags(word, 1)
+		concept_semantics = get_semantics(word,1)
+		for mood in concept_moodtags:
+			final_moods.append("#"+mood[0])
+
+		for semantic in concept_semantics:
+			final_semantic.append(semantic[0])
+
+		vector = final_moods + ['positive'] + final_semantic
+		senticvector[word] = vector
+
 
 	for word in neg_words:
-		print word
-		print get_relevant_moodtags(word, -1)[:2]
+		final_moods = []
+		final_semantic = []
+		concept_moodtags = get_relevant_moodtags(word, -1)
+		concept_semantics = get_semantics(word,-1)
+		for mood in concept_moodtags:
+			final_moods.append("#"+mood[0])
+
+		for semantic in concept_semantics:
+			final_semantic.append(semantic[0])
+
+		vector = final_moods + ['negative'] + final_semantic
+		senticvector[word] = vector
+
+	python_data = "senticnet = {}\n"
+	for key, value in senticvector.iteritems():
+		string = "senticnet['{0}'] = ['{1}', '{2}', '{3}','{4}', '{5}', '{6}', '{7}', '{8}']\n"
+		string = string.format(key, value[0],value[1],value[2],value[3],value[4],value[5],value[6],value[7])
+		python_data += string
+	python_data_file = open('senticnet_new_data.py', 'w+')
+	python_data_file.write(python_data)
+
 
 
 if __name__ == '__main__':
