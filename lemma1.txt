@@ -1,0 +1,43 @@
+
+Adjectives ->	Lemmatized
+third	third
+regrettable	regrettable
+classiest	classiest
+cheapest	cheapest
+
+Plurals ->	Lemmatized
+cats	cat
+dogs	dog
+chairs	chair
+brothers	brothers
+sisters	sisters
+
+Verbs ->	Lemmatized
+assemble	assemble
+assess	assess
+assign	assign
+avoid	avoid
+
+Noun ->	Lemmatized
+Casino	Casino
+wind	wind
+subhumanity	subhumanity
+undergraduates	undergraduates
+
+Prepositions ->	Lemmatized
+among	among
+whether	whether
+around	around
+until	until
+
+Conjucations ->	Lemmatized
+both	both
+and	and
+either	either
+therefore	therefore
+
+Non-american ->	Lemmatized
+gemeinschaft	gemeinschaft
+salutaris	salutaris
+quibusdam	quibusdam
+terram	terram

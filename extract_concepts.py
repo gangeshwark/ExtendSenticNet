@@ -14,7 +14,9 @@ Since I could not make the concept_parser in Java up and running, I am using the
 """
 from nltk.corpus import sentiwordnet as swn
 from nltk.corpus import wordnet as wn
+import nltk
 import random
+import enchant
 from lemmatizer import MyLemmatizer
 from semantic_similarity import SemanticSimilarity
 import operator
@@ -25,25 +27,45 @@ BING_LIU_DATA_PATH = 'data/bingliu_lexicon'
 OUTPUT_BASE_PATH = 'data/new_data'
 
 SS = SemanticSimilarity()
+ml = MyLemmatizer()
 current_pos_concepts = [key for (key, value) in senticnet.iteritems() if value[6]=='positive']
 current_neg_concepts = [key for (key, value) in senticnet.iteritems() if value[6]=='negative']
 
 def preprocess(word):
-	"""Function to lemmatize a word
+	"""
+	Function to lemmatize a word
 		1. Remove plurals
 		2. Remove verb inflictions
 		3. Remove negation
 		4. Remove prepositions
 		5. Remove conjunctions
-		6. Remove Foriegn Language
+		6. Remove Foriegn Language																																																																																																																																																													
 	"""
-	pass
+	#check if english word
+	english_d = enchant.Dict("en_US")
+	if not english_d.check(word):
+		return ''
+
+
+	word = nltk.word_tokenize(word)
+	word = nltk.pos_tag(word)	
+	# No preposition and conjunction. And no foreign words																																																										
+	pos_list = [ 'IN', 'CC', 'FW']
+	new_word = []
+	for w in word:
+		if w[1] not in pos_list:
+			new_word.append(w[0])
+
+	'_'join(map(str, new_word))
+	return ml.lemmatize(word)
 
 
 def get_new_concepts():
-	"""Extracts new concepts using SentiWordNet(SWN) and Bing Liu's Opinion lexicon.
+	"""
+		Extracts new concepts using SentiWordNet(SWN) and Bing Liu's Opinion lexicon.
+		Also adding few manually picked up concepts.
 
-	Arguments:
+	Arguments: None
 
 	Returns:
 		List of new concepts
@@ -67,7 +89,6 @@ def get_new_concepts():
 		else:
 			swn_negative_words.append(word_name)
 
-	
 
 	#include only if they are not available in knowledge base of senticnet
 	print "Checking SenticNet..."
@@ -84,10 +105,11 @@ def get_new_concepts():
 	new_pos_words = list(set(swn_positive_words)-set(current_concepts))
 	print "Negative Words"
 	new_neg_words = list(set(swn_negative_words)-set(current_concepts))
+	"""
 	print "Sample SWN: Length: ", len(new_pos_words), len(new_neg_words)
 	print new_pos_words[:10]
 	print new_neg_words[:10]
-	
+	"""
 	#Section 2: code to extract concepts from Bing Liu's Opinion lexicon.
 	print "Extracting from Bing Liu"
 	with open(BING_LIU_DATA_PATH + "/positive-words.txt", 'r') as bing_pos_file:
@@ -116,11 +138,11 @@ def get_new_concepts():
 	bing_new_pos_words = list(set(bing_positive_words)-set(current_concepts))
 	print "Negative Words"
 	bing_new_neg_words = list(set(bing_negative_words)-set(current_concepts))
-
+	"""
 	print "Sample Bing Liu: Length: ", len(bing_new_pos_words), len(bing_new_neg_words)
 	print bing_new_pos_words
 	print bing_new_neg_words
-
+	"""
 	new_pos_words+=bing_new_pos_words
 	new_neg_words+=bing_new_neg_words
 
@@ -239,15 +261,15 @@ def get_semantics(word, polarity):
 	print rank
 
 	semantics = ['semantic1', 'semantic2', 'semantic3', 'semantic4', 'semantic5']
-	return semantics
+	return rank
 
 
 def main():
 	pos_words, neg_words = [],[]
-	#pos_words, neg_words = get_new_concepts()
+	pos_words, neg_words = get_new_concepts()
 
-	neg_words = ["concerns", "negatives"]
-	pos_words = ["achievements", "revelation"]
+	neg_words = neg_words[:2]
+	pos_words = pos_words[:2]
 	#Every key in the dictionary is a new concept and the value is a 8-value list with the format as below
 	#[#mood_tag1, #mood_tag2, polarity, semantic1, semantic2, semantic3, semantic4, semantic5]
 	

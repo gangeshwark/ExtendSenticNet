@@ -1,3 +1,5 @@
 senticnet = {}
-senticnet['concerns'] = ['#disgusting', '#scared', 'negative','semantic1', 'semantic2', 'semantic3', 'semantic4', 'semantic5']
-senticnet['negatives'] = ['#scared', '#sad', 'negative','semantic1', 'semantic2', 'semantic3', 'semantic4', 'semantic5']
+senticnet['achievements'] = ['#interesting', '#surprising', 'positive','s', 's', 's', 's', 's']
+senticnet['revelation'] = ['#interesting', '#surprising', 'positive','s', 's', 's', 's', 's']
+senticnet['concerns'] = ['#disgusting', '#scared', 'negative','s', 's', 's', 's', 's']
+senticnet['negatives'] = ['#scared', '#sad', 'negative','s', 's', 's', 's', 's']
