@@ -114,6 +114,8 @@ if __name__ == '__main__':
 		print "Is English? {0}".format(english_d.check(w))
 
 	#Non-american
+	#Observed that NTLK POS Tagger didn't identify the individual words in the following list as Non-English words(FW)
+	#Hence using enchant lib for the same.
 	words = ["gemeinschaft", "salutaris", "quibusdam", "terram"]
 	print "\nNon-american ->\tLemmatized"
 	for w in words:
@@ -121,4 +123,3 @@ if __name__ == '__main__':
 
 	for w in words:
 		print "Is English? {0}".format(english_d.check(w))
-

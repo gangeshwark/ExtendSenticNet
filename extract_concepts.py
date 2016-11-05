@@ -54,10 +54,10 @@ def preprocess(word):
 	new_word = []
 	for w in word:
 		if w[1] not in pos_list:
-			new_word.append(w[0])
+			new_word.append(ml.lemmatize(w[0]))
 
-	'_'join(map(str, new_word))
-	return ml.lemmatize(word)
+	return '_'join(map(str, new_word))
+	
 
 
 def get_new_concepts():
@@ -78,20 +78,25 @@ def get_new_concepts():
 	swn_negative_words = []
 	swn_positive_words = []
 	new_neg_words, new_pos_words = [], []
-	#Section 1: code to extract from SWN.
+	#Section 1: code to extract concepts from SWN.
 	#Call preprocess for every word encountered.
 	print "Extracting from SWN"
 	swn_all_words = swn.all_senti_synsets()
 	for word in swn_all_words:
 		word_name = word.synset.name().split('.')[0]
 		if word.pos_score() > word.neg_score():
-			swn_positive_words.append(word_name)
+			w = preprocess(word_name)
+			if w is not '':
+				swn_positive_words.append(w)
 		else:
-			swn_negative_words.append(word_name)
+			w = preprocess(word_name)
+			if w is not '':
+				swn_negative_words.append(w)
 
 
 	#include only if they are not available in knowledge base of senticnet
 	print "Checking SenticNet..."
+	# Running time O(n^2). Better solution below.
 	"""
 	for x in xrange(len(swn_positive_words)):
 		if swn_positive_words[x] not in current_concepts:
@@ -101,6 +106,7 @@ def get_new_concepts():
 		if swn_negative_words[x] not in current_concepts:
 			new_neg_words.append(swn_negative_words[x])
 	"""
+	#Running time O(n*logn)
 	print "Positive Words"
 	new_pos_words = list(set(swn_positive_words)-set(current_concepts))
 	print "Negative Words"
@@ -115,15 +121,18 @@ def get_new_concepts():
 	with open(BING_LIU_DATA_PATH + "/positive-words.txt", 'r') as bing_pos_file:
 		for line in bing_pos_file:
 			w = preprocess(line)
-			bing_positive_words.append(w)
+			if w is not '':
+				bing_positive_words.append(w)
 
 	with open(BING_LIU_DATA_PATH + "/negative-words.txt", 'r') as bing_neg_file:
 		for line in bing_neg_file:
 			w = preprocess(line)
-			bing_negative_words.append(w)
+			if w is not '':
+				bing_negative_words.append(w)
 	
 	#include only if they are not available in knowledge base of senticnet
 	print "Checking SenticNet..."
+	# Running time O(n^2). Better solution below.
 	"""
 	for x in xrange(len(bing_positive_words)):
 		if bing_positive_words[x] not in current_concepts:
@@ -134,6 +143,7 @@ def get_new_concepts():
 			new_neg_words.append(bing_negative_words[x])
 	"""
 	#unique concepts
+	#Running time O(n*logn)
 	print "Positive Words"
 	bing_new_pos_words = list(set(bing_positive_words)-set(current_concepts))
 	print "Negative Words"
@@ -172,7 +182,7 @@ def get_random_moodtags(polarity):
 	return moodtags
 
 
-# This code returns almost 0 for all the values
+# This code returns 0 for few moods.
 def get_relevant_moodtags(word, polarity):
 
 	positive_moodtags = ['joyful', 'interesting', 'surprising', 'admirable']
@@ -278,9 +288,9 @@ def main():
 		final_moods = []
 		final_semantic = []
 		concept_moodtags = get_relevant_moodtags(word, 1)
-		concept_semantics = get_semantics(word,1)
+		concept_semantics = get_semantics(word, 1)
 		for mood in concept_moodtags:
-			final_moods.append("#"+mood[0])
+			final_moods.append("#" + mood[0])
 
 		for semantic in concept_semantics:
 			final_semantic.append(semantic[0])
@@ -295,7 +305,7 @@ def main():
 		concept_moodtags = get_relevant_moodtags(word, -1)
 		concept_semantics = get_semantics(word,-1)
 		for mood in concept_moodtags:
-			final_moods.append("#"+mood[0])
+			final_moods.append("#" + mood[0])
 
 		for semantic in concept_semantics:
 			final_semantic.append(semantic[0])
@@ -303,6 +313,7 @@ def main():
 		vector = final_moods + ['negative'] + final_semantic
 		senticvector[word] = vector
 
+	#data to write to python file.
 	python_data = "senticnet = {}\n"
 	for key, value in senticvector.iteritems():
 		string = "senticnet['{0}'] = ['{1}', '{2}', '{3}','{4}', '{5}', '{6}', '{7}', '{8}']\n"
