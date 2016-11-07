@@ -12,7 +12,7 @@ from senticnet4_data import senticnet
 from nltk.corpus import sentiwordnet as swn
 from nltk.corpus import wordnet as wn
 import nltk
-from extract_concepts import preprocess, OUTPUT_BASE_PATH, CURRENT_SENTICNET_DATA_PATH, BING_LIU_DATA_PATH
+from add_concepts import preprocess, OUTPUT_BASE_PATH, CURRENT_SENTICNET_DATA_PATH, BING_LIU_DATA_PATH
 from datetime import datetime
 from logger import *
 
