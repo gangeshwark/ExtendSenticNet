@@ -1,5 +1,5 @@
 '''
-    File name: extract_concepts.py
+    File name: understand.py
     Author: Gangeshwar Krishnamurthy
     Email: gangeshwark@gmail.com
     Date created: 11/05/2016
@@ -13,20 +13,22 @@ from nltk.corpus import wordnet as wn
 import nltk
 import enchant
 import logging
+from datetime import datetime
 
+startTime = datetime.now()
 
 BING_LIU_DATA_PATH = 'data/bingliu_lexicon'
 
 #Does sentiwordnet have words with '_' or multi_words?
 swn_all_words = swn.all_senti_synsets()
 swn_words = []
-logging.info(__name__ + " - " + "\nSWN")
+print "\nSWN"
 for word in swn_all_words:
 	word_name = word.synset.name().split('.')[0]
 	if '_' in word_name:
 		swn_words.append(word_name)
 
-logging.info(__name__ + " - " +  str(len(swn_words)) + str(swn_words[:10]))
+print str(len(swn_words)) + str(swn_words[:10])
 
 #What about Bing Liu?
 logging.info(__name__ + " - " + "\nBing Liu")
@@ -36,7 +38,7 @@ with open(BING_LIU_DATA_PATH + "/positive-words.txt", 'r') as bing_pos_file:
 		w = str(line)
 		if '_' in w:
 			words.append(w)
-logging.info(__name__ + " - " + str(len(words)) + str(words[:5]))
+print str(len(words)) + str(words[:5])
 
 
 words = []
@@ -45,7 +47,7 @@ with open(BING_LIU_DATA_PATH + "/negative-words.txt", 'r') as bing_neg_file:
 		w = str(line)
 		if '_' in w:
 			words.append(w)
-logging.info(__name__ + " - " + str(len(words)) + str(words[:5]))
+print str(len(words)) + str(words[:5])
 
 """
 OUTPUT:
@@ -60,4 +62,14 @@ Bing Liu
 # Will enchant work with multi-words?
 english_d = enchant.Dict("en_US")
 for word in swn_words:
-	logging.info(__name__ + " - " + "Is '{0}' English? {1}".format(word, english_d.check(word)))
+	print "Is '{0}' English? {1}".format(word, english_d.check(word))
+
+
+print "Time taken: " + str(datetime.now() - startTime)
+
+def test():
+	startTime = datetime.now()
+
+	print "Time to execute func - {0}: {1}".format(__name__, datetime.now() - startTime)
+
+test()

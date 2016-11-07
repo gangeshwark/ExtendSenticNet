@@ -89,31 +89,31 @@ def get_new_concepts():
 	Returns:
 		List of new concepts
 	"""
-	new_pos_words, new_neg_words = [], []
+	startTime = datetime.now()
+	new_pos_words, new_neg_words = ["achievements", "revelation"], ["concerns", "negatives"] # for testing purpose
 	try:
 		with open(OUTPUT_BASE_PATH + '/new_positive_words.txt', 'r') as posi_file:
+			new_pos_words = []
 			for word in posi_file:
 				new_pos_words.append(word)
 	except IOError, e:
 		logging.error("File I/O error: {0}".format(str(e)), exc_info=True)
-		new_neg_words = [] # for testing purpose
 	except Exception, e:
 		logging.error("Error: {0}".format(str(e)), exc_info=True)
-		new_neg_words = [] # for testing purpose
 	
 
 	try:
 		with open(OUTPUT_BASE_PATH + '/new_negative_words.txt', 'r') as neg_file:
+			new_neg_words = []
 			for word in neg_file:
 				new_neg_words.append(word)
 	except IOError, e:
 		logging.error("File I/O error: {0}".format(str(e)), exc_info=True)
-		new_neg_words = [] # for testing purpose
 	except Exception, e:
 		logging.error("Error: {0}".format(str(e)), exc_info=True)
-		new_neg_words = [] # for testing purpose
 
-	
+
+	logging.error("Time to execute add_concepts.get_new_concepts(): {0}".format(datetime.now() - startTime))
 	return new_pos_words, new_neg_words
 
 
@@ -151,6 +151,7 @@ def get_relevant_moodtags(word, polarity):
 	Returns:
 		list with 2 moodtags.
 	"""
+	startTime = datetime.now()
 	positive_moodtags = ['joyful', 'interesting', 'surprising', 'admirable']
 	negative_moodtags=['sad','scared','angry','disgusting']
 	
@@ -187,7 +188,8 @@ def get_relevant_moodtags(word, polarity):
 		mood_sorted = sorted(mood_values.items(), key=operator.itemgetter(1))
 		mood_sorted = reversed(mood_sorted)
 		mood_sorted = list(mood_sorted)
-		
+	
+	logging.error("Time to execute add_concepts.get_relevant_moodtags({0}): {1}".format(word, datetime.now() - startTime))
 	return mood_sorted[:2]
 
 
@@ -209,6 +211,7 @@ def get_semantics(word, polarity):
 		the same set of data available in SenticNet.
 		This can also be thought of intuitively when we want to relate words/concepts using graph representation.
 	'''
+	startTime = datetime.now()
 	#seperate positive concepts and negative concepts from the SenticNet data 
 	#to ensure we don't relate concepts with different polarity
 	if polarity == 1:
@@ -236,11 +239,14 @@ def get_semantics(word, polarity):
 
 	logging.info(str(rank))
 
-	semantics = ['semantic1', 'semantic2', 'semantic3', 'semantic4', 'semantic5']
+	startTime = datetime.now()
+	logging.error("Time to execute add_concepts.get_semantics({0}): {1}".format(word, datetime.now() - startTime))
 	return rank
 
 
 def main():
+	startTime = datetime.now()
+	
 	pos_words, neg_words = [],[]
 	pos_words, neg_words = get_new_concepts()
 	#For the below code to run on the complete pos_words, neg_words lists will take a lot of time.
@@ -288,10 +294,12 @@ def main():
 		python_data += string
 	python_data_file = open('senticnet_new_data.py', 'w+')
 	python_data_file.write(python_data)
+	logging.error("Time to execute add_concepts.main(): {0}".format(datetime.now() - startTime))
 
 
 
 if __name__ == '__main__':
+	startTime = datetime.now()
 	logger = logging.getLogger()
 	logger.setLevel(logging.DEBUG)
 	output_dir = 'logs'
@@ -318,3 +326,4 @@ if __name__ == '__main__':
 	logger.addHandler(handler)
 
 	main()
+	logging.error("Time to execute add_concepts.py: {0}".format(datetime.now() - startTime))

@@ -56,11 +56,11 @@ def extract_new_concepts():
 		word_name = word.synset.name().split('.')[0]
 		if word.pos_score() > word.neg_score():
 			w = preprocess(word_name)
-			if w is not '':
+			if w and w is not '':
 				swn_positive_words.append(w)
 		else:
 			w = preprocess(word_name)
-			if w is not '':
+			if w and w is not '':
 				swn_negative_words.append(w)
 
 
@@ -134,11 +134,12 @@ def extract_new_concepts():
 	with open(OUTPUT_BASE_PATH + '/new_negative_words.txt', 'w+') as out_neg_file:
 		for word in new_neg_words:
 			out_neg_file.write("%s\n" %word)
-
-	logging.info("Time to execute func - {0}: {1}".format(__name__, datetime.now() - startTime))
+	#startTime = datetime.now()		
+	logging.error("Time to execute extract_new_concepts.extract_new_concepts(): {0}".format(datetime.now() - startTime))
 
 
 if __name__ == '__main__':
+	startTime = datetime.now()
 	logger = logging.getLogger()
 	logger.setLevel(logging.DEBUG)
 	output_dir = 'logs'
@@ -165,3 +166,4 @@ if __name__ == '__main__':
 	logger.addHandler(handler)
 
 	extract_new_concepts()
+	logging.error("Time to execute extract_new_concepts.main(): {0}".format(datetime.now() - startTime))
