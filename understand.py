@@ -11,19 +11,20 @@ Python file to understand properties of libraries.
 from nltk.corpus import sentiwordnet as swn
 from nltk.corpus import wordnet as wn
 import nltk
+import enchant
 
 BING_LIU_DATA_PATH = 'data/bingliu_lexicon'
 
-#Does sentiwordnet have words with '_' or two seperate words?
+#Does sentiwordnet have words with '_' or multi_words?
 swn_all_words = swn.all_senti_synsets()
-words = []
+swn_words = []
 print "\nSWN"
 for word in swn_all_words:
 	word_name = word.synset.name().split('.')[0]
 	if '_' in word_name:
-		words.append(word_name)
+		swn_words.append(word_name)
 
-print len(words), words[:10]
+print len(swn_words), swn_words[:10]
 
 #What about Bing Liu?
 print "\nBing Liu"
@@ -53,3 +54,8 @@ Bing Liu
 0 []
 0 []
 """
+
+# Will enchant work with multi-words?
+english_d = enchant.Dict("en_US")
+for word in swn_words:
+	print "Is English? {0}".format(english_d.check(word))

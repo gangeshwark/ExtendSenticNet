@@ -39,16 +39,26 @@ def preprocess(word):
 		3. Remove negation
 		4. Remove prepositions
 		5. Remove conjunctions
-		6. Remove Foriegn Language																																																																																																																																																													
+		6. Remove Foriegn Language	
+
+	Arguments:
+		Word to be preprocessed.
+
+	Returns:
+		lemmatized word if the word in American English, else return a empty string.																																																																																																																																																												
 	"""
 	#check if english word
 	english_d = enchant.Dict("en_US")
-	if not english_d.check(word):
-		return ''
-
-
+	split_words = word.split('_')
+	for x in split_words:
+		try:
+			if not english_d.check(x):
+				return ''
+		except Exception as e:
+			print "Enchant error({0}): {1}\nWord: {2}, {3}".format(e.errno, e.strerror, x, word)
+	
 	word = nltk.word_tokenize(word)
-	word = nltk.pos_tag(word)	
+	word = nltk.pos_tag(word)
 	# No preposition and conjunction. And no foreign words																																																										
 	pos_list = [ 'IN', 'CC', 'FW']
 	new_word = []
@@ -56,106 +66,30 @@ def preprocess(word):
 		if w[1] not in pos_list:
 			new_word.append(ml.lemmatize(w[0]))
 
-	return '_'join(map(str, new_word))
+	return '_'.join(map(str, new_word))
 	
 
-
+'''
+Old function moved to file new_concepts.py
+'''
 def get_new_concepts():
 	"""
-		Extracts new concepts using SentiWordNet(SWN) and Bing Liu's Opinion lexicon.
-		Also adding few manually picked up concepts.
+	Extracts new concepts from the new words file.
 
 	Arguments: None
 
 	Returns:
 		List of new concepts
 	"""
-	current_concepts = [key for (key, value) in senticnet.iteritems()]
-	print current_concepts[:10]
-	bing_negative_words = []
-	bing_positive_words = []
+	new_pos_words, new_neg_words = [], []
+	with open(OUTPUT_BASE_PATH + '/new_positive_words.txt') as posi_file:
+		for word in posi_file:
+			new_pos_words.append(word)
 
-	swn_negative_words = []
-	swn_positive_words = []
-	new_neg_words, new_pos_words = [], []
-	#Section 1: code to extract concepts from SWN.
-	#Call preprocess for every word encountered.
-	print "Extracting from SWN"
-	swn_all_words = swn.all_senti_synsets()
-	for word in swn_all_words:
-		word_name = word.synset.name().split('.')[0]
-		if word.pos_score() > word.neg_score():
-			w = preprocess(word_name)
-			if w is not '':
-				swn_positive_words.append(w)
-		else:
-			w = preprocess(word_name)
-			if w is not '':
-				swn_negative_words.append(w)
-
-
-	#include only if they are not available in knowledge base of senticnet
-	print "Checking SenticNet..."
-	# Running time O(n^2). Better solution below.
-	"""
-	for x in xrange(len(swn_positive_words)):
-		if swn_positive_words[x] not in current_concepts:
-			new_pos_words.append(swn_positive_words[x])
-
-	for x in xrange(len(swn_negative_words)):
-		if swn_negative_words[x] not in current_concepts:
-			new_neg_words.append(swn_negative_words[x])
-	"""
-	#Running time O(n*logn)
-	print "Positive Words"
-	new_pos_words = list(set(swn_positive_words)-set(current_concepts))
-	print "Negative Words"
-	new_neg_words = list(set(swn_negative_words)-set(current_concepts))
-	"""
-	print "Sample SWN: Length: ", len(new_pos_words), len(new_neg_words)
-	print new_pos_words[:10]
-	print new_neg_words[:10]
-	"""
-	#Section 2: code to extract concepts from Bing Liu's Opinion lexicon.
-	print "Extracting from Bing Liu"
-	with open(BING_LIU_DATA_PATH + "/positive-words.txt", 'r') as bing_pos_file:
-		for line in bing_pos_file:
-			w = preprocess(line)
-			if w is not '':
-				bing_positive_words.append(w)
-
-	with open(BING_LIU_DATA_PATH + "/negative-words.txt", 'r') as bing_neg_file:
-		for line in bing_neg_file:
-			w = preprocess(line)
-			if w is not '':
-				bing_negative_words.append(w)
+	with open(OUTPUT_BASE_PATH + '/new_negative_words.txt') as neg_file:
+		for word in neg_file:
+			new_neg_words.append(word)
 	
-	#include only if they are not available in knowledge base of senticnet
-	print "Checking SenticNet..."
-	# Running time O(n^2). Better solution below.
-	"""
-	for x in xrange(len(bing_positive_words)):
-		if bing_positive_words[x] not in current_concepts:
-			new_pos_words.append(bing_positive_words[x])
-
-	for x in xrange(len(bing_negative_words)):
-		if bing_negative_words[x] not in current_concepts:
-			new_neg_words.append(bing_negative_words[x])
-	"""
-	#unique concepts
-	#Running time O(n*logn)
-	print "Positive Words"
-	bing_new_pos_words = list(set(bing_positive_words)-set(current_concepts))
-	print "Negative Words"
-	bing_new_neg_words = list(set(bing_negative_words)-set(current_concepts))
-	"""
-	print "Sample Bing Liu: Length: ", len(bing_new_pos_words), len(bing_new_neg_words)
-	print bing_new_pos_words
-	print bing_new_neg_words
-	"""
-	new_pos_words+=bing_new_pos_words
-	new_neg_words+=bing_new_neg_words
-
 	return new_pos_words, new_neg_words
 
 
@@ -184,7 +118,15 @@ def get_random_moodtags(polarity):
 
 # This code returns 0 for few moods.
 def get_relevant_moodtags(word, polarity):
+	"""
+	Chooses two moodtags from a list of 4 moodtags using it's similarity score with the input word
 
+	Arguments:
+		polarity: takes value +1 or -1. +1 indicates positive polarity and -1 indicates negative polarity.
+
+	Returns:
+		list with 2 moodtags.
+	"""
 	positive_moodtags = ['joyful', 'interesting', 'surprising', 'admirable']
 	negative_moodtags=['sad','scared','angry','disgusting']
 	
@@ -239,15 +181,15 @@ def get_semantics(word, polarity):
 
 	'''
 	Observation:
-		Observing the SenticNet data, I found that the semantically related words/concepts for a word/concepts is from 
+		Looking at the SenticNet data, I observed that semantically related words/concepts for a word/concept is from 
 		the same set of data available in SenticNet.
-		This can also be thought of intuitively when we want to relation between words/concepts using graph.
+		This can also be thought of intuitively when we want to relate words/concepts using graph representation.
 	'''
 	#seperate positive concepts and negative concepts from the SenticNet data 
 	#to ensure we don't relate concepts with different polarity
 	if polarity == 1:
 		rank = {}
-		print "POL: 1", word
+		print "Polarity: 1", word
 		for concept in current_pos_concepts:
 			rank[concept] = SS.word_similarity(word, concept)
 
@@ -259,7 +201,7 @@ def get_semantics(word, polarity):
 
 	else:
 		rank = {}
-		print "POL: -1", word
+		print "Polarity: -1", word
 		for concept in current_neg_concepts:
 			rank[concept] = SS.word_similarity(word, concept)
 
@@ -277,9 +219,10 @@ def get_semantics(word, polarity):
 def main():
 	pos_words, neg_words = [],[]
 	pos_words, neg_words = get_new_concepts()
-
-	neg_words = neg_words[:2]
-	pos_words = pos_words[:2]
+	#For the below code to run on the complete pos_words, neg_words lists will take a lot of time.
+	#Hence for demo purpose using only few words from each of them.
+	neg_words = neg_words[:3]
+	pos_words = pos_words[:3]
 	#Every key in the dictionary is a new concept and the value is a 8-value list with the format as below
 	#[#mood_tag1, #mood_tag2, polarity, semantic1, semantic2, semantic3, semantic4, semantic5]
 	
