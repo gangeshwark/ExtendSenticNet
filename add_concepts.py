@@ -21,6 +21,8 @@ from lemmatizer import MyLemmatizer
 from semantic_similarity import SemanticSimilarity
 import operator
 from senticnet4_data import senticnet
+import logging
+import os.path
 
 CURRENT_SENTICNET_DATA_PATH = 'data/current_senticnet_kb'
 BING_LIU_DATA_PATH = 'data/bingliu_lexicon'
@@ -31,7 +33,7 @@ ml = MyLemmatizer()
 current_pos_concepts = [key for (key, value) in senticnet.iteritems() if value[6]=='positive']
 current_neg_concepts = [key for (key, value) in senticnet.iteritems() if value[6]=='negative']
 
-initialize_logger("logs")
+#initialize_logger("logs")
 
 def preprocess(word):
 	"""
@@ -55,10 +57,10 @@ def preprocess(word):
 	for x in split_words:
 		try:
 			if not english_d.check(x):
-				logging.info(__name__ + " - " + "Non-English word: {0} in {1}".format(x, word))
+				logging.debug("Non-English word: {0} in {1}".format(x, word))
 				return ''
 		except Exception as e:
-			logging.error(__name__ + " - " + "Enchant error: {0}\nWord: {1} in {2}".format(str(e), x, word))
+			logging.error("Enchant error: {0}\nWord: {1} in {2}".format(str(e), x, word))
 			return ''
 
 	#not lemmatizing single word from a multiword seperated by _ because it might change the meaning of the multi word.
@@ -92,11 +94,11 @@ def get_new_concepts():
 		with open(OUTPUT_BASE_PATH + '/new_positive_words.txt', 'r') as posi_file:
 			for word in posi_file:
 				new_pos_words.append(word)
-	except FileNotFoundError, e:
-		logging.error(__name__ + " - " + "File I/O error: {0}".format(str(e)), exc_info=True)
+	except IOError, e:
+		logging.error("File I/O error: {0}".format(str(e)), exc_info=True)
 		new_neg_words = [] # for testing purpose
 	except Exception, e:
-		logging.error(__name__ + " - " + "Error: {0}".format(str(e)), exc_info=True)
+		logging.error("Error: {0}".format(str(e)), exc_info=True)
 		new_neg_words = [] # for testing purpose
 	
 
@@ -104,11 +106,11 @@ def get_new_concepts():
 		with open(OUTPUT_BASE_PATH + '/new_negative_words.txt', 'r') as neg_file:
 			for word in neg_file:
 				new_neg_words.append(word)
-	except FileNotFoundError, e:
-		logging.error(__name__ + " - " + "File I/O error: {0}".format(str(e)), exc_info=True)
+	except IOError, e:
+		logging.error("File I/O error: {0}".format(str(e)), exc_info=True)
 		new_neg_words = [] # for testing purpose
 	except Exception, e:
-		logging.error(__name__ + " - " + "Error: {0}".format(str(e)), exc_info=True)
+		logging.error("Error: {0}".format(str(e)), exc_info=True)
 		new_neg_words = [] # for testing purpose
 
 	
@@ -232,7 +234,7 @@ def get_semantics(word, polarity):
 		rank = reversed(rank)
 		rank = list(rank)[:5]
 
-	logging.info(__name__ + " - " + str(rank))
+	logging.info(str(rank))
 
 	semantics = ['semantic1', 'semantic2', 'semantic3', 'semantic4', 'semantic5']
 	return rank
@@ -290,4 +292,29 @@ def main():
 
 
 if __name__ == '__main__':
+	logger = logging.getLogger()
+	logger.setLevel(logging.DEBUG)
+	output_dir = 'logs'
+	 
+	# create console handler and set level to info
+	handler = logging.StreamHandler()
+	handler.setLevel(logging.INFO)
+	formatter = logging.Formatter("%(asctime)s [%(levelname)s] %(funcName)s: %(message)s")
+	handler.setFormatter(formatter)
+	logger.addHandler(handler)
+
+	# create error file handler and set level to error
+	handler = logging.FileHandler(os.path.join(output_dir, "error.log"),"w", encoding=None, delay="true")
+	handler.setLevel(logging.ERROR)
+	formatter = logging.Formatter("%(asctime)s [%(levelname)s] {%(funcName)s:%(lineno)d}: %(message)s")
+	handler.setFormatter(formatter)
+	logger.addHandler(handler)
+
+	# create debug file handler and set level to debug
+	handler = logging.FileHandler(os.path.join(output_dir, "all.log"),"w")
+	handler.setLevel(logging.DEBUG)
+	formatter = logging.Formatter("%(asctime)s [%(levelname)s] %(funcName)s: %(message)s")
+	handler.setFormatter(formatter)
+	logger.addHandler(handler)
+
 	main()

@@ -14,9 +14,11 @@ from nltk.corpus import wordnet as wn
 import nltk
 from add_concepts import preprocess, OUTPUT_BASE_PATH, CURRENT_SENTICNET_DATA_PATH, BING_LIU_DATA_PATH
 from datetime import datetime
-from logger import *
+import logging, logging.config
+import os.path
+#from logger import *
 
-initialize_logger("logs")
+#initialize_logger("logs")
 '''
 logging.debug("debug message")
 logging.info("info message")
@@ -37,10 +39,9 @@ def extract_new_concepts():
 		List of new concepts
 	"""
 	startTime = datetime.now()
-
 	current_concepts = [key for (key, value) in senticnet.iteritems()]
-	logging.info(__name__ + " - " + "Currently Available Concepts: (sample)")
-	logging.info(__name__ + " - " + current_concepts[:10])
+	logging.info("Currently Available Concepts: (sample)")
+	logging.info(str(current_concepts[:10]))
 	bing_negative_words = []
 	bing_positive_words = []
 
@@ -49,7 +50,7 @@ def extract_new_concepts():
 	new_neg_words, new_pos_words = [], []
 	#Section 1: code to extract concepts from SWN.
 	#Call preprocess for every word encountered.
-	logging.info(__name__ + " - " + "Extracting from SWN")
+	logging.info("Extracting from SWN")
 	swn_all_words = swn.all_senti_synsets()
 	for word in swn_all_words:
 		word_name = word.synset.name().split('.')[0]
@@ -64,7 +65,7 @@ def extract_new_concepts():
 
 
 	#include only if they are not available in knowledge base of senticnet
-	logging.info(__name__ + " - " + "Checking SenticNet...")
+	logging.info("Checking SenticNet...")
 	# Running time O(n^2). Better solution below.
 	"""
 	for x in xrange(len(swn_positive_words)):
@@ -76,9 +77,9 @@ def extract_new_concepts():
 			new_neg_words.append(swn_negative_words[x])
 	"""
 	#Running time O(n*logn)
-	logging.info(__name__ + " - " + "Positive Words")
+	logging.info("Positive Words")
 	new_pos_words = list(set(swn_positive_words)-set(current_concepts))
-	logging.info(__name__ + " - " + "Negative Words")
+	logging.info("Negative Words")
 	new_neg_words = list(set(swn_negative_words)-set(current_concepts))
 	"""
 	print "Sample SWN: Length: ", len(new_pos_words), len(new_neg_words)
@@ -86,7 +87,7 @@ def extract_new_concepts():
 	print new_neg_words[:10]
 	"""
 	#Section 2: code to extract concepts from Bing Liu's Opinion lexicon.
-	logging.info(__name__ + " - " + "Extracting from Bing Liu")
+	logging.info("Extracting from Bing Liu")
 	with open(BING_LIU_DATA_PATH + "/positive-words.txt", 'r') as bing_pos_file:
 		for line in bing_pos_file:
 			w = preprocess(line)
@@ -100,7 +101,7 @@ def extract_new_concepts():
 				bing_negative_words.append(w)
 	
 	#include only if they are not available in knowledge base of senticnet
-	logging.info(__name__ + " - " + "Checking SenticNet...")
+	logging.info("Checking SenticNet...")
 	# Running time O(n^2). Better solution below.
 	"""
 	for x in xrange(len(bing_positive_words)):
@@ -113,9 +114,9 @@ def extract_new_concepts():
 	"""
 	#unique concepts
 	#Running time O(n*logn)
-	logging.info(__name__ + " - " + "Positive Words")
+	logging.info("Positive Words")
 	bing_new_pos_words = list(set(bing_positive_words)-set(current_concepts))
-	logging.info(__name__ + " - " + "Negative Words")
+	logging.info("Negative Words")
 	bing_new_neg_words = list(set(bing_negative_words)-set(current_concepts))
 	"""
 	print "Sample Bing Liu: Length: ", len(bing_new_pos_words), len(bing_new_neg_words)
@@ -134,8 +135,33 @@ def extract_new_concepts():
 		for word in new_neg_words:
 			out_neg_file.write("%s\n" %word)
 
-	logging.info(__name__ + " - " + "Time to execute func - {0}: {1}".format(__name__, datetime.now() - startTime))
+	logging.info("Time to execute func - {0}: {1}".format(__name__, datetime.now() - startTime))
 
 
 if __name__ == '__main__':
+	logger = logging.getLogger()
+	logger.setLevel(logging.DEBUG)
+	output_dir = 'logs'
+	 
+	# create console handler and set level to info
+	handler = logging.StreamHandler()
+	handler.setLevel(logging.INFO)
+	formatter = logging.Formatter("%(asctime)s [%(levelname)s] %(funcName)s: %(message)s")
+	handler.setFormatter(formatter)
+	logger.addHandler(handler)
+
+	# create error file handler and set level to error
+	handler = logging.FileHandler(os.path.join(output_dir, "error.log"),"w", encoding=None, delay="true")
+	handler.setLevel(logging.ERROR)
+	formatter = logging.Formatter("%(asctime)s [%(levelname)s] {%(funcName)s:%(lineno)d}: %(message)s")
+	handler.setFormatter(formatter)
+	logger.addHandler(handler)
+
+	# create debug file handler and set level to debug
+	handler = logging.FileHandler(os.path.join(output_dir, "all.log"),"w")
+	handler.setLevel(logging.DEBUG)
+	formatter = logging.Formatter("%(asctime)s [%(levelname)s] %(funcName)s: %(message)s")
+	handler.setFormatter(formatter)
+	logger.addHandler(handler)
+
 	extract_new_concepts()

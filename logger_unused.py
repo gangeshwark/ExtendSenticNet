@@ -2,7 +2,7 @@ import logging, logging.config
 import os.path
  
 def initialize_logger(output_dir, name='root'):
-    #logging.basicConfig(disable_existing_loggers=True)
+    
     
     logger = logging.getLogger()
     logger.setLevel(logging.DEBUG)

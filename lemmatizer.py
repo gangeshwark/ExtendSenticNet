@@ -12,9 +12,7 @@ import nltk
 import enchant
 
 from nltk.corpus import wordnet
-from logger import *
-
-initialize_logger("logs")
+import logging
 
 class MyLemmatizer():
 
@@ -34,7 +32,8 @@ class MyLemmatizer():
 			tagged = nltk.pos_tag(nltk.word_tokenize(word))
 			return self.lemmatizer.lemmatize(tagged[0][0], pos=get_wordnet_pos(tagged[0][1]))
 		except Exception, e:
-			return "TypeError: Cannot convert input type to string."
+			logging.error("Error: {0}".format(str(e)), exc_info=True)
+			return ''
 
 
 def get_wordnet_pos(treebank_tag):

@@ -12,9 +12,8 @@ from nltk.corpus import sentiwordnet as swn
 from nltk.corpus import wordnet as wn
 import nltk
 import enchant
-from logger import *
+import logging
 
-initialize_logger("logs")
 
 BING_LIU_DATA_PATH = 'data/bingliu_lexicon'
 
