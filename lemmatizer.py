@@ -12,6 +12,9 @@ import nltk
 import enchant
 
 from nltk.corpus import wordnet
+from logger import *
+
+initialize_logger("logs")
 
 class MyLemmatizer():
 

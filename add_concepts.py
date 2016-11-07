@@ -1,5 +1,5 @@
 '''
-    File name: extract_concepts.py
+    File name: add_concepts.py
     Author: Gangeshwar Krishnamurthy
     Email: gangeshwark@gmail.com
     Date created: 11/03/2016
@@ -31,6 +31,8 @@ ml = MyLemmatizer()
 current_pos_concepts = [key for (key, value) in senticnet.iteritems() if value[6]=='positive']
 current_neg_concepts = [key for (key, value) in senticnet.iteritems() if value[6]=='negative']
 
+initialize_logger("logs")
+
 def preprocess(word):
 	"""
 	Function to lemmatize a word
@@ -53,13 +55,17 @@ def preprocess(word):
 	for x in split_words:
 		try:
 			if not english_d.check(x):
+				logging.info(__name__ + " - " + "Non-English word: {0} in {1}".format(x, word))
 				return ''
 		except Exception as e:
-			print "Enchant error({0}): {1}\nWord: {2}, {3}".format(e.errno, e.strerror, x, word)
-	
+			logging.error(__name__ + " - " + "Enchant error: {0}\nWord: {1} in {2}".format(str(e), x, word))
+			return ''
+
+	#not lemmatizing single word from a multiword seperated by _ because it might change the meaning of the multi word.
+	#And I believe the concept_parser java module does this. 
 	word = nltk.word_tokenize(word)
 	word = nltk.pos_tag(word)
-	# No preposition and conjunction. And no foreign words																																																										
+	# No preposition and conjunction. And no foreign words
 	pos_list = [ 'IN', 'CC', 'FW']
 	new_word = []
 	for w in word:
@@ -82,13 +88,29 @@ def get_new_concepts():
 		List of new concepts
 	"""
 	new_pos_words, new_neg_words = [], []
-	with open(OUTPUT_BASE_PATH + '/new_positive_words.txt') as posi_file:
-		for word in posi_file:
-			new_pos_words.append(word)
+	try:
+		with open(OUTPUT_BASE_PATH + '/new_positive_words.txt', 'r') as posi_file:
+			for word in posi_file:
+				new_pos_words.append(word)
+	except FileNotFoundError, e:
+		logging.error(__name__ + " - " + "File I/O error: {0}".format(str(e)), exc_info=True)
+		new_neg_words = [] # for testing purpose
+	except Exception, e:
+		logging.error(__name__ + " - " + "Error: {0}".format(str(e)), exc_info=True)
+		new_neg_words = [] # for testing purpose
+	
 
-	with open(OUTPUT_BASE_PATH + '/new_negative_words.txt') as neg_file:
-		for word in neg_file:
-			new_neg_words.append(word)
+	try:
+		with open(OUTPUT_BASE_PATH + '/new_negative_words.txt', 'r') as neg_file:
+			for word in neg_file:
+				new_neg_words.append(word)
+	except FileNotFoundError, e:
+		logging.error(__name__ + " - " + "File I/O error: {0}".format(str(e)), exc_info=True)
+		new_neg_words = [] # for testing purpose
+	except Exception, e:
+		logging.error(__name__ + " - " + "Error: {0}".format(str(e)), exc_info=True)
+		new_neg_words = [] # for testing purpose
+
 	
 	return new_pos_words, new_neg_words
 
@@ -210,7 +232,7 @@ def get_semantics(word, polarity):
 		rank = reversed(rank)
 		rank = list(rank)[:5]
 
-	print rank
+	logging.info(__name__ + " - " + str(rank))
 
 	semantics = ['semantic1', 'semantic2', 'semantic3', 'semantic4', 'semantic5']
 	return rank

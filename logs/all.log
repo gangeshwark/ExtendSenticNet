@@ -1,0 +1,6 @@
+2016-11-07 17:27:55,317 - root - ERROR - from sample log
+2016-11-07 17:27:55,317 - root - DEBUG - debug message
+2016-11-07 17:27:55,317 - root - INFO - info message
+2016-11-07 17:27:55,318 - root - WARNING - warning message
+2016-11-07 17:27:55,318 - root - ERROR - error message
+2016-11-07 17:27:55,318 - root - CRITICAL - critical message
