@@ -1,11 +1,16 @@
 # ExtendSenticNet
+## Index
+- [Python Dependencies](#python-dependencies)
+- [Instructions](#instructions)
+- [OUTPUT file](#output-file)
+- [More ways to extend SenticNet](#more-ways-to-extend-senticnet)
 
-## Python dependencies:
+## Python Dependencies:
 - [NLTK](http://www.nltk.org/install.html)
 - [Enchant](http://pythonhosted.org/pyenchant/tutorial.html)
 	- $ pip install pyenchant
 
-## Steps:
+## Instructions:
 1. Run the script _extract_new_concepts.py_ using the command.  
 	`$ python extract_new_concepts.py`  
 	This script extracts concepts from other lexicons.
