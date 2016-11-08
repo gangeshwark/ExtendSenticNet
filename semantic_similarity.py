@@ -258,7 +258,7 @@ class SemanticSimilarity(object):
 	        (1.0 - DELTA) * self.word_order_similarity(sentence_1, sentence_2)
 
 
-"""
+
 #Test Code
 if __name__ == '__main__':
 	SS = SemanticSimilarity()
@@ -294,13 +294,10 @@ if __name__ == '__main__':
   ["oracle", "sage", 0.43],
   ["serf", "slave", 0.39]
 	]
-	for word_pair in word_pairs:
-		print "%s\t%s\t%.2f\t%.2f" % (word_pair[0], word_pair[1], word_pair[2], 
-                                  SS.word_similarity(word_pair[0], word_pair[1]))
 
 	sentence_pairs = [
     ["I like that bachelor.", "I like that unmarried man.", 0.561],
-    ["John is very nice.", "Is John very nice?", 0.977],
+    ["John is very nice.", "Is John very nice", 0.977],
     ["Red alcoholic drink.", "A bottle of wine.", 0.585],
     ["Red alcoholic drink.", "Fresh orange juice.", 0.611],
     ["Red alcoholic drink.", "An English dictionary.", 0.0],
@@ -316,8 +313,45 @@ if __name__ == '__main__':
     ["I have a hammer.", "Take some nails.", 0.508],
     ["I have a hammer.", "Take some apples.", 0.121]
 	]
+	#similarity for word_pairs
+	print "\nword_similarity for word_pairs"
+	for word_pair in word_pairs:
+		print "%s\t%s\t%.2f\t%.2f" % (word_pair[0], word_pair[1], word_pair[2],
+			SS.word_similarity(word_pair[0], word_pair[1]))
+
+	#similarity for sentence_pairs
+	print "\nsimilarity for sentence_pairs"
 	for sent_pair in sentence_pairs:
 		print "%s\t%s\t%.3f\t%.3f\t%.3f" % (sent_pair[0], sent_pair[1], sent_pair[2], 
 			SS.similarity(sent_pair[0], sent_pair[1], False),
-        	SS.similarity(sent_pair[0], sent_pair[1], True))
-"""
+			SS.similarity(sent_pair[0], sent_pair[1], True))
+
+	#similarity for word_pairs
+	print "\nsimilarity for word_pairs"
+	for word_pair in word_pairs:
+		print "%s\t%s\t%.3f\t%.3f\t%.3f" % (word_pair[0], word_pair[1], word_pair[2], 
+			SS.similarity(word_pair[0], word_pair[1], False),
+			SS.similarity(word_pair[0], word_pair[1], True))
+
+	#word_similarity for sentence_pairs
+	print "\nword_similarity for sentence_pairs"
+	for sent_pair in sentence_pairs:
+		print "%s\t%s\t%.2f\t%.2f" % (sent_pair[0], sent_pair[1], sent_pair[2], 
+			SS.word_similarity(sent_pair[0], sent_pair[1]))
+
+	"""
+	OUTPUT:
+
+
+	"""
+	"""
+	Observation from the test:
+	1. Use word_similarity func to compare words.
+	2. And use similarity func to compare sentences.
+	3. DO NOT use word_similarity to compare sentences. It returns score as 0.
+	4. Though similarity returns a score value for words, they are not accurate. word_similarity performs better for words.
+
+	Based on these Observations, we can conclude that 
+	we can use similarity func if either/both of the inputs is a sentence.
+	and use word_similarity if both are words.
+	"""

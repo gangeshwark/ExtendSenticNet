@@ -14,6 +14,7 @@ import enchant
 from nltk.corpus import wordnet
 import logging
 
+
 class MyLemmatizer():
 
 	def __init__(self):

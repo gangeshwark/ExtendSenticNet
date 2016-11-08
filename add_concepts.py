@@ -23,6 +23,7 @@ import operator
 from senticnet4_data import senticnet
 import logging
 import os.path
+from datetime import datetime
 
 CURRENT_SENTICNET_DATA_PATH = 'data/current_senticnet_kb'
 BING_LIU_DATA_PATH = 'data/bingliu_lexicon'
@@ -30,10 +31,13 @@ OUTPUT_BASE_PATH = 'data/new_data'
 
 SS = SemanticSimilarity()
 ml = MyLemmatizer()
-current_pos_concepts = [key for (key, value) in senticnet.iteritems() if value[6]=='positive']
-current_neg_concepts = [key for (key, value) in senticnet.iteritems() if value[6]=='negative']
+
 
 #initialize_logger("logs")
+
+current_pos_concepts = [" ".join(map(str, key.strip().split("_"))) for (key, value) in senticnet.iteritems() if value[6]=='positive']
+current_neg_concepts = [" ".join(map(str, key.strip().split("_"))) for (key, value) in senticnet.iteritems() if value[6]=='negative']
+
 
 def preprocess(word):
 	"""
@@ -95,7 +99,7 @@ def get_new_concepts():
 		with open(OUTPUT_BASE_PATH + '/new_positive_words.txt', 'r') as posi_file:
 			new_pos_words = []
 			for word in posi_file:
-				new_pos_words.append(word)
+				new_pos_words.append(word.strip())
 	except IOError, e:
 		logging.error("File I/O error: {0}".format(str(e)), exc_info=True)
 	except Exception, e:
@@ -106,13 +110,13 @@ def get_new_concepts():
 		with open(OUTPUT_BASE_PATH + '/new_negative_words.txt', 'r') as neg_file:
 			new_neg_words = []
 			for word in neg_file:
-				new_neg_words.append(word)
+				new_neg_words.append(word.strip())
 	except IOError, e:
 		logging.error("File I/O error: {0}".format(str(e)), exc_info=True)
 	except Exception, e:
 		logging.error("Error: {0}".format(str(e)), exc_info=True)
 
-
+	logging.info("Number of pos_words: {0} ; neg_words: {1}".format(len(new_pos_words), len(new_neg_words)))
 	logging.error("Time to execute add_concepts.get_new_concepts(): {0}".format(datetime.now() - startTime))
 	return new_pos_words, new_neg_words
 
@@ -154,14 +158,27 @@ def get_relevant_moodtags(word, polarity):
 	startTime = datetime.now()
 	positive_moodtags = ['joyful', 'interesting', 'surprising', 'admirable']
 	negative_moodtags=['sad','scared','angry','disgusting']
-	
 	if polarity == -1:
-		#lemmatized each mood. Scores are 0 for sad and angry.
-		sad = SS.word_similarity(word, "sad")
-		scared = SS.word_similarity(word, "scar")
-		angry = SS.word_similarity(word, "angry")
-		disgusting = SS.word_similarity(word, "disgust")
-		
+		#based on the observation made in semantic_similarity.py
+		if word.count(' ')>0: # if sentence
+			#lemmatized each mood since the scores were 0 for all the moods. Scores are still 0 for sad and angry.
+			sad = SS.similarity(word, "sad", False)
+			scared = SS.similarity(word, "scar", False)
+			angry = SS.similarity(word, "angry", False)
+			disgusting = SS.similarity(word, "disgust", False)
+		elif word.count(' ')==0: # if word
+			#lemmatized each mood since the scores were 0 for all the moods. Scores are still 0 for sad and angry.
+			sad = SS.word_similarity(word, "sad")
+			scared = SS.word_similarity(word, "scar")
+			angry = SS.word_similarity(word, "angry")
+			disgusting = SS.word_similarity(word, "disgust")
+		else: # if other.
+			#lemmatized each mood since the scores were 0 for all the moods. Scores are still 0 for sad and angry.
+			sad = SS.similarity(word, "sad", False)
+			scared = SS.similarity(word, "scar", False)
+			angry = SS.similarity(word, "angry", False)
+			disgusting = SS.similarity(word, "disgust", False)
+
 		mood_values = {	
 				'sad':sad,
 				'scared':scared,
@@ -173,12 +190,26 @@ def get_relevant_moodtags(word, polarity):
 		mood_sorted = list(mood_sorted)
 
 	elif polarity == 1:
-		#lemmatized each mood. Scores are 0 for joyful and admirable.
-		joyful = SS.word_similarity(word, "joyful") 
-		interesting = SS.word_similarity(word, "interest")
-		surprising = SS.word_similarity(word, "surprise")
-		admirable = SS.word_similarity(word, "admirable")
-		
+		#based on the observation made in semantic_similarity.py
+		if word.count(' ')>0: # if sentence
+			#lemmatized each mood since the scores were 0 for all the moods. Scores are still 0 for sad and angry.
+			joyful = SS.similarity(word, "joyful", False) 
+			interesting = SS.similarity(word, "interest", False)
+			surprising = SS.similarity(word, "surprise", False)
+			admirable = SS.similarity(word, "admirable", False)
+		elif word.count(' ')==0: # if word
+			#lemmatized each mood since the scores were 0 for all the moods. Scores are still 0 for sad and angry.
+			joyful = SS.word_similarity(word, "joyful") 
+			interesting = SS.word_similarity(word, "interest")
+			surprising = SS.word_similarity(word, "surprise")
+			admirable = SS.word_similarity(word, "admirable")
+		else: # if other.
+			#lemmatized each mood since the scores were 0 for all the moods. Scores are still 0 for sad and angry.
+			joyful = SS.similarity(word, "joyful", False) 
+			interesting = SS.similarity(word, "interest", False)
+			surprising = SS.similarity(word, "surprise", False)
+			admirable = SS.similarity(word, "admirable", False)
+				
 		mood_values = {
 				'joyful':joyful,
 				'interesting':interesting,
@@ -188,6 +219,7 @@ def get_relevant_moodtags(word, polarity):
 		mood_sorted = sorted(mood_values.items(), key=operator.itemgetter(1))
 		mood_sorted = reversed(mood_sorted)
 		mood_sorted = list(mood_sorted)
+	logging.info(str(mood_sorted))
 	
 	logging.error("Time to execute add_concepts.get_relevant_moodtags({0}): {1}".format(word, datetime.now() - startTime))
 	return mood_sorted[:2]
@@ -211,14 +243,20 @@ def get_semantics(word, polarity):
 		the same set of data available in SenticNet.
 		This can also be thought of intuitively when we want to relate words/concepts using graph representation.
 	'''
+
 	startTime = datetime.now()
 	#seperate positive concepts and negative concepts from the SenticNet data 
 	#to ensure we don't relate concepts with different polarity
 	if polarity == 1:
 		rank = {}
-		print "Polarity: 1", word
 		for concept in current_pos_concepts:
-			rank[concept] = SS.word_similarity(word, concept)
+			#based on the observation made in semantic_similarity.py
+			if concept.count(' ')>0 or word.count(' ')>0:
+				rank[concept] = SS.similarity(word, concept, False)
+			elif concept.count(' ')==0 and word.count(' ')==0:
+				rank[concept] = SS.word_similarity(word, concept)
+			else:
+				rank[concept] = SS.similarity(word, concept, False)
 
 		#sort in the descending order of scores of the similarity
 		rank = sorted(rank.items(), key=operator.itemgetter(1))
@@ -228,9 +266,14 @@ def get_semantics(word, polarity):
 
 	else:
 		rank = {}
-		print "Polarity: -1", word
 		for concept in current_neg_concepts:
-			rank[concept] = SS.word_similarity(word, concept)
+			#based on the observation made in semantic_similarity.py
+			if concept.count(' ')>0 or word.count(' ')>0:
+				rank[concept] = SS.similarity(word, concept, False)
+			elif concept.count(' ')==0 and word.count(' ')==0:
+				rank[concept] = SS.word_similarity(word, concept)
+			else:
+				rank[concept] = SS.similarity(word, concept, False)
 
 		#sort in the descending order of scores of the similarity
 		rank = sorted(rank.items(), key=operator.itemgetter(1))
@@ -247,17 +290,23 @@ def get_semantics(word, polarity):
 def main():
 	startTime = datetime.now()
 	
-	pos_words, neg_words = [],[]
+	pos_words, neg_words = [], []
 	pos_words, neg_words = get_new_concepts()
 	#For the below code to run on the complete pos_words, neg_words lists will take a lot of time.
 	#Hence for demo purpose using only few words from each of them.
-	neg_words = neg_words[:3]
-	pos_words = pos_words[:3]
+	
+	neg_words = neg_words[:5]
+	pos_words = pos_words[:5]
+	
 	#Every key in the dictionary is a new concept and the value is a 8-value list with the format as below
 	#[#mood_tag1, #mood_tag2, polarity, semantic1, semantic2, semantic3, semantic4, semantic5]
 	
 	senticvector = {}
 	for word in pos_words:
+		word = word.split(" ")
+		word = word[0]
+		word = " ".join(map(str, word.strip().split("_")))
+		print "Polarity: 1", word
 		final_moods = []
 		final_semantic = []
 		concept_moodtags = get_relevant_moodtags(word, 1)
@@ -273,6 +322,10 @@ def main():
 
 
 	for word in neg_words:
+		word = word.split(" ")
+		word = word[0]
+		word = " ".join(map(str, word.strip().split("_")))
+		print "Polarity: -1", word
 		final_moods = []
 		final_semantic = []
 		concept_moodtags = get_relevant_moodtags(word, -1)
@@ -290,7 +343,7 @@ def main():
 	python_data = "senticnet = {}\n"
 	for key, value in senticvector.iteritems():
 		string = "senticnet['{0}'] = ['{1}', '{2}', '{3}','{4}', '{5}', '{6}', '{7}', '{8}']\n"
-		string = string.format(key, value[0],value[1],value[2],value[3],value[4],value[5],value[6],value[7])
+		string = string.format(key, value[0], value[1], value[2], value[3], value[4], value[5], value[6], value[7])
 		python_data += string
 	python_data_file = open('senticnet_new_data.py', 'w+')
 	python_data_file.write(python_data)

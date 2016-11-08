@@ -52,16 +52,21 @@ def extract_new_concepts():
 	#Call preprocess for every word encountered.
 	logging.info("Extracting from SWN")
 	swn_all_words = swn.all_senti_synsets()
+	i, j = 0, 0
 	for word in swn_all_words:
+		"""if i >=5 and j>=5:
+			break"""
 		word_name = word.synset.name().split('.')[0]
 		if word.pos_score() > word.neg_score():
 			w = preprocess(word_name)
 			if w and w is not '':
 				swn_positive_words.append(w)
+				#i+=1
 		else:
 			w = preprocess(word_name)
 			if w and w is not '':
 				swn_negative_words.append(w)
+				#j+=1
 
 
 	#include only if they are not available in knowledge base of senticnet
@@ -81,24 +86,32 @@ def extract_new_concepts():
 	new_pos_words = list(set(swn_positive_words)-set(current_concepts))
 	logging.info("Negative Words")
 	new_neg_words = list(set(swn_negative_words)-set(current_concepts))
-	"""
-	print "Sample SWN: Length: ", len(new_pos_words), len(new_neg_words)
+	
+	print "Sample SWN: \tTotal Length: ", len(new_pos_words), len(new_neg_words)
 	print new_pos_words[:10]
 	print new_neg_words[:10]
-	"""
+	
 	#Section 2: code to extract concepts from Bing Liu's Opinion lexicon.
 	logging.info("Extracting from Bing Liu")
+	i=0
 	with open(BING_LIU_DATA_PATH + "/positive-words.txt", 'r') as bing_pos_file:
 		for line in bing_pos_file:
+			if i==1:
+				break
 			w = preprocess(line)
 			if w is not '':
 				bing_positive_words.append(w)
+				i+=1
 
+	i=0
 	with open(BING_LIU_DATA_PATH + "/negative-words.txt", 'r') as bing_neg_file:
 		for line in bing_neg_file:
+			if i==1:
+				break
 			w = preprocess(line)
 			if w is not '':
 				bing_negative_words.append(w)
+				i+=1
 	
 	#include only if they are not available in knowledge base of senticnet
 	logging.info("Checking SenticNet...")
