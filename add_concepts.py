@@ -295,49 +295,55 @@ def main():
 	#For the below code to run on the complete pos_words, neg_words lists will take a lot of time.
 	#Hence for demo purpose using only few words from each of them.
 	
-	neg_words = neg_words[:5]
-	pos_words = pos_words[:5]
+	#neg_words = neg_words[:5]
+	#pos_words = pos_words[:5]
 	
 	#Every key in the dictionary is a new concept and the value is a 8-value list with the format as below
 	#[#mood_tag1, #mood_tag2, polarity, semantic1, semantic2, semantic3, semantic4, semantic5]
-	
+	python_data_file = open('senticnet_new_data.py', 'w+')
 	senticvector = {}
-	for word in pos_words:
-		word = word.split(" ")
-		word = word[0]
-		word = " ".join(map(str, word.strip().split("_")))
-		print "Polarity: 1", word
-		final_moods = []
-		final_semantic = []
-		concept_moodtags = get_relevant_moodtags(word, 1)
-		concept_semantics = get_semantics(word, 1)
-		for mood in concept_moodtags:
-			final_moods.append("#" + mood[0])
+	if cal_pol:
+		for word in pos_words:
+			word = word.split(" ")
+			word = word[0]
+			word = " ".join(map(str, word.strip().split("_")))
+			print "Polarity: 1", word
+			final_moods = []
+			final_semantic = []
+			concept_moodtags = get_relevant_moodtags(word, 1)
+			concept_semantics = get_semantics(word, 1)
+			for mood in concept_moodtags:
+				final_moods.append("#" + mood[0])
 
-		for semantic in concept_semantics:
-			final_semantic.append(semantic[0])
+			for semantic in concept_semantics:
+				final_semantic.append(semantic[0])
 
-		vector = final_moods + ['positive'] + final_semantic
-		senticvector[word] = vector
+			vector = final_moods + ['positive'] + final_semantic
+			senticvector[word] = vector
+			string = "senticnet['{0}'] = ['{1}', '{2}', '{3}','{4}', '{5}', '{6}', '{7}', '{8}']\n"
+			string = string.format(word, vector[0], vector[1], vector[2], vector[3], vector[4], vector[5], vector[6], vector[7])
+			python_data_file.write(python_data)
+	else:
+		for word in neg_words:
+			word = word.split(" ")
+			word = word[0]
+			word = " ".join(map(str, word.strip().split("_")))
+			print "Polarity: -1", word
+			final_moods = []
+			final_semantic = []
+			concept_moodtags = get_relevant_moodtags(word, -1)
+			concept_semantics = get_semantics(word,-1)
+			for mood in concept_moodtags:
+				final_moods.append("#" + mood[0])
 
+			for semantic in concept_semantics:
+				final_semantic.append(semantic[0])
 
-	for word in neg_words:
-		word = word.split(" ")
-		word = word[0]
-		word = " ".join(map(str, word.strip().split("_")))
-		print "Polarity: -1", word
-		final_moods = []
-		final_semantic = []
-		concept_moodtags = get_relevant_moodtags(word, -1)
-		concept_semantics = get_semantics(word,-1)
-		for mood in concept_moodtags:
-			final_moods.append("#" + mood[0])
-
-		for semantic in concept_semantics:
-			final_semantic.append(semantic[0])
-
-		vector = final_moods + ['negative'] + final_semantic
-		senticvector[word] = vector
+			vector = final_moods + ['negative'] + final_semantic
+			senticvector[word] = vector
+			string = "senticnet['{0}'] = ['{1}', '{2}', '{3}','{4}', '{5}', '{6}', '{7}', '{8}']\n"
+			string = string.format(word, vector[0], vector[1], vector[2], vector[3], vector[4], vector[5], vector[6], vector[7])
+			python_data_file.write(python_data)
 
 	#data to write to python file.
 	python_data = "senticnet = {}\n"
@@ -352,6 +358,16 @@ def main():
 
 
 if __name__ == '__main__':
+	import sys
+	if len(sys.argv)<2:
+		cal_pol = 1
+	else:
+		if sys.argv[1] == 'p':
+			cal_pol = 1
+		else:
+			cal_pol = 0
+
+	print cal_pol
 	startTime = datetime.now()
 	logger = logging.getLogger()
 	logger.setLevel(logging.DEBUG)
