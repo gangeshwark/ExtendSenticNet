@@ -373,8 +373,8 @@ def main():
 			final_moods = []
 			final_semantic = []
 			concept_moodtags = get_relevant_moodtags(word, 1)
-			concept_semantics = [' ', ' ', ' ', ' ', ' ']#get_semantics(word, 1)
-			#concept_semantics = get_semantics(word, 1)
+			#concept_semantics = [' ', ' ', ' ', ' ', ' ']#get_semantics(word, 1)
+			concept_semantics = get_semantics(word, 1)
 			for mood in concept_moodtags:
 				final_moods.append("#" + mood[0])
 
@@ -400,8 +400,8 @@ def main():
 			final_moods = []
 			final_semantic = []
 			concept_moodtags = get_relevant_moodtags(word, -1)
-			concept_semantics = [' ', ' ', ' ', ' ', ' ']#get_semantics(word,-1)
-			#concept_semantics = get_semantics(word,-1)
+			#concept_semantics = [' ', ' ', ' ', ' ', ' ']#get_semantics(word,-1)
+			concept_semantics = get_semantics(word,-1)
 			for mood in concept_moodtags:
 				final_moods.append("#" + mood[0])
 
