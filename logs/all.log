@@ -1,4 +1,2 @@
-2016-11-29 09:10:59,678 [INFO] get_new_concepts: Number of pos_words: 3663 ; neg_words: 30747
-2016-11-29 09:10:59,679 [ERROR] get_new_concepts: Time to execute add_concepts.get_new_concepts(): 0:00:00.010350
-2016-11-29 09:11:03,427 [INFO] get_relevant_moodtags: [('scared', 0.2984857090096987), ('disgusting', 0.20008095420436167), ('sad', 0.0), ('angry', 0.0)]
-2016-11-29 09:11:03,427 [ERROR] get_relevant_moodtags: Time to execute add_concepts.get_relevant_moodtags(homomorphism): 0:00:03.748051
+2016-11-29 20:54:07,816 [INFO] get_new_concepts: Number of pos_words: 3663 ; neg_words: 30747
+2016-11-29 20:54:07,816 [ERROR] get_new_concepts: Time to execute add_concepts.get_new_concepts(): 0:00:00.010924

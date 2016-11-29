@@ -24,6 +24,7 @@ from senticnet4_data import senticnet
 import logging
 import os.path
 from datetime import datetime
+import re
 
 CURRENT_SENTICNET_DATA_PATH = 'data/current_senticnet_kb'
 BING_LIU_DATA_PATH = 'data/bingliu_lexicon'
@@ -307,7 +308,8 @@ def main():
 		for word in pos_words:
 			word = word.split(" ")
 			word = word[0]
-			word = " ".join(map(str, word.strip().split("_")))
+			word = re.split('_|-| ', word)
+			word = " ".join(word)
 			print "Polarity: 1", word
 			final_moods = []
 			final_semantic = []
@@ -322,15 +324,16 @@ def main():
 			vector = final_moods + ['positive'] + final_semantic
 			senticvector[word] = vector
 			with open('senticnet_new_pos_data.py', 'w+') as python_data_file_positive:
-				string = "senticnet['{0}'] = ['{1}', '{2}', '{3}','{4}', '{5}', '{6}', '{7}', '{8}']\n"
+				string = "senticnet['{0}'] = ['{1}', '{2}', '{3}', '{4}', '{5}', '{6}', '{7}', '{8}']\n"
 				string = string.format(word, vector[0], vector[1], vector[2], vector[3], vector[4], vector[5], vector[6], vector[7])
-				python_data_file_positive.write(python_data)
+				python_data_file_positive.write(string)
 	else:
 		#python_data_file_negative = open('senticnet_new_neg_data.py', 'w+')
 		for word in neg_words:
 			word = word.split(" ")
 			word = word[0]
-			word = " ".join(map(str, word.strip().split("_")))
+			word = re.split('_|-| ', word)
+			word = " ".join(word)
 			print "Polarity: -1", word
 			final_moods = []
 			final_semantic = []
@@ -345,9 +348,9 @@ def main():
 			vector = final_moods + ['negative'] + final_semantic
 			senticvector[word] = vector
 			with open('senticnet_new_neg_data.py', 'w+') as python_data_file_negative:
-				string = "senticnet['{0}'] = ['{1}', '{2}', '{3}','{4}', '{5}', '{6}', '{7}', '{8}']\n"
+				string = "senticnet['{0}'] = ['{1}', '{2}', '{3}', '{4}', '{5}', '{6}', '{7}', '{8}']\n"
 				string = string.format(word, vector[0], vector[1], vector[2], vector[3], vector[4], vector[5], vector[6], vector[7])
-				python_data_file_negative.write(python_data)
+				python_data_file_negative.write(string)
 
 	#data to write to python file.
 	"""
