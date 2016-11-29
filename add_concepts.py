@@ -99,8 +99,12 @@ def get_new_concepts():
 	try:
 		with open(OUTPUT_BASE_PATH + '/new_positive_words.txt', 'r') as posi_file:
 			new_pos_words = []
+			i = 0
 			for word in posi_file:
+				if i == 300:
+					break
 				new_pos_words.append(word.strip())
+				i+=1
 	except IOError, e:
 		logging.error("File I/O error: {0}".format(str(e)), exc_info=True)
 	except Exception, e:
@@ -110,7 +114,11 @@ def get_new_concepts():
 	try:
 		with open(OUTPUT_BASE_PATH + '/new_negative_words.txt', 'r') as neg_file:
 			new_neg_words = []
+			i=0
 			for word in neg_file:
+				if i == 300:
+					break
+				i+=1
 				new_neg_words.append(word.strip())
 	except IOError, e:
 		logging.error("File I/O error: {0}".format(str(e)), exc_info=True)
@@ -161,23 +169,36 @@ def get_relevant_moodtags(word, polarity):
 	negative_moodtags=['sad','scared','angry','disgusting']
 	if polarity == -1:
 		#based on the observation made in semantic_similarity.py
+		"""
+		Observation from the test:
+		1. Use word_similarity func to compare words.
+		2. And use similarity func to compare sentences.
+		3. DO NOT use word_similarity to compare sentences. It returns score as 0.
+		4. Though similarity returns a score value for words, they are not accurate. word_similarity performs better for words.
+
+		Based on these Observations, we can conclude that 
+		we can use similarity func if either/both of the inputs is a sentence.
+		and use word_similarity if both are words.
+		"""
+		#initially used sad, scar, angry, disgust
+		#After trying with different forms of words: sorrow, scar, anger and disgust seems to perform well.
 		if word.count(' ')>0: # if sentence
 			#lemmatized each mood since the scores were 0 for all the moods. Scores are still 0 for sad and angry.
-			sad = SS.similarity(word, "sad", False)
+			sad = SS.similarity(word, "sorrow", False)
 			scared = SS.similarity(word, "scar", False)
-			angry = SS.similarity(word, "angry", False)
+			angry = SS.similarity(word, "anger", False)
 			disgusting = SS.similarity(word, "disgust", False)
 		elif word.count(' ')==0: # if word
 			#lemmatized each mood since the scores were 0 for all the moods. Scores are still 0 for sad and angry.
-			sad = SS.word_similarity(word, "sad")
+			sad = SS.word_similarity(word, "sorrow")
 			scared = SS.word_similarity(word, "scar")
-			angry = SS.word_similarity(word, "angry")
+			angry = SS.word_similarity(word, "anger")
 			disgusting = SS.word_similarity(word, "disgust")
 		else: # if other.
 			#lemmatized each mood since the scores were 0 for all the moods. Scores are still 0 for sad and angry.
-			sad = SS.similarity(word, "sad", False)
+			sad = SS.similarity(word, "sorrow", False)
 			scared = SS.similarity(word, "scar", False)
-			angry = SS.similarity(word, "angry", False)
+			angry = SS.similarity(word, "anger", False)
 			disgusting = SS.similarity(word, "disgust", False)
 
 		mood_values = {	
@@ -192,24 +213,38 @@ def get_relevant_moodtags(word, polarity):
 
 	elif polarity == 1:
 		#based on the observation made in semantic_similarity.py
+		"""
+		Observation from the test:
+		1. Use word_similarity func to compare words.
+		2. And use similarity func to compare sentences.
+		3. DO NOT use word_similarity to compare sentences. It returns score as 0.
+		4. Though similarity returns a score value for words, they are not accurate. word_similarity performs better for words.
+
+		Based on these Observations, we can conclude that 
+		we can use similarity func if either/both of the inputs is a sentence.
+		and use word_similarity if both are words.
+		"""
+
+		#initially used joyful, interest, surprise, admirable
+		#After trying with different forms of words: joy, surprise, admiration and interest seems to perform well.
 		if word.count(' ')>0: # if sentence
 			#lemmatized each mood since the scores were 0 for all the moods. Scores are still 0 for sad and angry.
 			joyful = SS.similarity(word, "joyful", False) 
 			interesting = SS.similarity(word, "interest", False)
 			surprising = SS.similarity(word, "surprise", False)
-			admirable = SS.similarity(word, "admirable", False)
+			admirable = SS.similarity(word, "admiration", False)
 		elif word.count(' ')==0: # if word
 			#lemmatized each mood since the scores were 0 for all the moods. Scores are still 0 for sad and angry.
 			joyful = SS.word_similarity(word, "joyful") 
 			interesting = SS.word_similarity(word, "interest")
 			surprising = SS.word_similarity(word, "surprise")
-			admirable = SS.word_similarity(word, "admirable")
+			admirable = SS.word_similarity(word, "admiration")
 		else: # if other.
 			#lemmatized each mood since the scores were 0 for all the moods. Scores are still 0 for sad and angry.
 			joyful = SS.similarity(word, "joyful", False) 
 			interesting = SS.similarity(word, "interest", False)
 			surprising = SS.similarity(word, "surprise", False)
-			admirable = SS.similarity(word, "admirable", False)
+			admirable = SS.similarity(word, "admiration", False)
 				
 		mood_values = {
 				'joyful':joyful,
@@ -252,6 +287,17 @@ def get_semantics(word, polarity):
 		rank = {}
 		for concept in current_pos_concepts:
 			#based on the observation made in semantic_similarity.py
+			"""
+			Observation from the test:
+			1. Use word_similarity func to compare words.
+			2. And use similarity func to compare sentences.
+			3. DO NOT use word_similarity to compare sentences. It returns score as 0.
+			4. Though similarity returns a score value for words, they are not accurate. word_similarity performs better for words.
+
+			Based on these Observations, we can conclude that 
+			we can use similarity func if either/both of the inputs is a sentence.
+			and use word_similarity if both are words.
+			"""
 			if concept.count(' ')>0 or word.count(' ')>0:
 				rank[concept] = SS.similarity(word, concept, False)
 			elif concept.count(' ')==0 and word.count(' ')==0:
@@ -269,6 +315,17 @@ def get_semantics(word, polarity):
 		rank = {}
 		for concept in current_neg_concepts:
 			#based on the observation made in semantic_similarity.py
+			"""
+			Observation from the test:
+			1. Use word_similarity func to compare words.
+			2. And use similarity func to compare sentences.
+			3. DO NOT use word_similarity to compare sentences. It returns score as 0.
+			4. Though similarity returns a score value for words, they are not accurate. word_similarity performs better for words.
+
+			Based on these Observations, we can conclude that 
+			we can use similarity func if either/both of the inputs is a sentence.
+			and use word_similarity if both are words.
+			"""
 			if concept.count(' ')>0 or word.count(' ')>0:
 				rank[concept] = SS.similarity(word, concept, False)
 			elif concept.count(' ')==0 and word.count(' ')==0:
@@ -303,6 +360,7 @@ def main():
 	#[#mood_tag1, #mood_tag2, polarity, semantic1, semantic2, semantic3, semantic4, semantic5]
 	
 	senticvector = {}
+	#polarity
 	if cal_pol:
 		#python_data_file_positive = open('senticnet_new_pos_data.py', 'w+')
 		for word in pos_words:
@@ -314,7 +372,8 @@ def main():
 			final_moods = []
 			final_semantic = []
 			concept_moodtags = get_relevant_moodtags(word, 1)
-			concept_semantics = get_semantics(word, 1)
+			concept_semantics = [' ', ' ', ' ', ' ', ' ']#get_semantics(word, 1)
+			#concept_semantics = get_semantics(word, 1)
 			for mood in concept_moodtags:
 				final_moods.append("#" + mood[0])
 
@@ -322,7 +381,7 @@ def main():
 				final_semantic.append(semantic[0])
 
 			vector = final_moods + ['positive'] + final_semantic
-			senticvector[word] = vector
+			#senticvector[word] = vector
 			with open('senticnet_new_pos_data.py', 'a') as python_data_file_positive:
 				string = "senticnet['{0}'] = ['{1}', '{2}', '{3}', '{4}', '{5}', '{6}', '{7}', '{8}']\n"
 				string = string.format(word, vector[0], vector[1], vector[2], vector[3], vector[4], vector[5], vector[6], vector[7])
@@ -338,7 +397,8 @@ def main():
 			final_moods = []
 			final_semantic = []
 			concept_moodtags = get_relevant_moodtags(word, -1)
-			concept_semantics = get_semantics(word,-1)
+			concept_semantics = [' ', ' ', ' ', ' ', ' ']#get_semantics(word,-1)
+			#concept_semantics = get_semantics(word,-1)
 			for mood in concept_moodtags:
 				final_moods.append("#" + mood[0])
 
@@ -346,7 +406,7 @@ def main():
 				final_semantic.append(semantic[0])
 
 			vector = final_moods + ['negative'] + final_semantic
-			senticvector[word] = vector
+			#senticvector[word] = vector
 			with open('senticnet_new_neg_data.py', 'a') as python_data_file_negative:
 				string = "senticnet['{0}'] = ['{1}', '{2}', '{3}', '{4}', '{5}', '{6}', '{7}', '{8}']\n"
 				string = string.format(word, vector[0], vector[1], vector[2], vector[3], vector[4], vector[5], vector[6], vector[7])
