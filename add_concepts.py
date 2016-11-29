@@ -300,9 +300,10 @@ def main():
 	
 	#Every key in the dictionary is a new concept and the value is a 8-value list with the format as below
 	#[#mood_tag1, #mood_tag2, polarity, semantic1, semantic2, semantic3, semantic4, semantic5]
-	python_data_file = open('senticnet_new_data.py', 'w+')
+	
 	senticvector = {}
 	if cal_pol:
+		#python_data_file_positive = open('senticnet_new_pos_data.py', 'w+')
 		for word in pos_words:
 			word = word.split(" ")
 			word = word[0]
@@ -320,10 +321,12 @@ def main():
 
 			vector = final_moods + ['positive'] + final_semantic
 			senticvector[word] = vector
-			string = "senticnet['{0}'] = ['{1}', '{2}', '{3}','{4}', '{5}', '{6}', '{7}', '{8}']\n"
-			string = string.format(word, vector[0], vector[1], vector[2], vector[3], vector[4], vector[5], vector[6], vector[7])
-			python_data_file.write(python_data)
+			with open('senticnet_new_pos_data.py', 'w+') as python_data_file_positive:
+				string = "senticnet['{0}'] = ['{1}', '{2}', '{3}','{4}', '{5}', '{6}', '{7}', '{8}']\n"
+				string = string.format(word, vector[0], vector[1], vector[2], vector[3], vector[4], vector[5], vector[6], vector[7])
+				python_data_file_positive.write(python_data)
 	else:
+		#python_data_file_negative = open('senticnet_new_neg_data.py', 'w+')
 		for word in neg_words:
 			word = word.split(" ")
 			word = word[0]
@@ -341,11 +344,13 @@ def main():
 
 			vector = final_moods + ['negative'] + final_semantic
 			senticvector[word] = vector
-			string = "senticnet['{0}'] = ['{1}', '{2}', '{3}','{4}', '{5}', '{6}', '{7}', '{8}']\n"
-			string = string.format(word, vector[0], vector[1], vector[2], vector[3], vector[4], vector[5], vector[6], vector[7])
-			python_data_file.write(python_data)
+			with open('senticnet_new_neg_data.py', 'w+') as python_data_file_negative:
+				string = "senticnet['{0}'] = ['{1}', '{2}', '{3}','{4}', '{5}', '{6}', '{7}', '{8}']\n"
+				string = string.format(word, vector[0], vector[1], vector[2], vector[3], vector[4], vector[5], vector[6], vector[7])
+				python_data_file_negative.write(python_data)
 
 	#data to write to python file.
+	"""
 	python_data = "senticnet = {}\n"
 	for key, value in senticvector.iteritems():
 		string = "senticnet['{0}'] = ['{1}', '{2}', '{3}','{4}', '{5}', '{6}', '{7}', '{8}']\n"
@@ -354,7 +359,7 @@ def main():
 	python_data_file = open('senticnet_new_data.py', 'w+')
 	python_data_file.write(python_data)
 	logging.error("Time to execute add_concepts.main(): {0}".format(datetime.now() - startTime))
-
+	"""
 
 
 if __name__ == '__main__':

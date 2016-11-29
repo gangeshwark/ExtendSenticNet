@@ -1,1 +1,2 @@
-2016-11-28 07:52:27,967 [ERROR] {get_new_concepts:120}: Time to execute add_concepts.get_new_concepts(): 0:00:00.008897
+2016-11-29 09:10:59,679 [ERROR] {get_new_concepts:120}: Time to execute add_concepts.get_new_concepts(): 0:00:00.010350
+2016-11-29 09:11:03,427 [ERROR] {get_relevant_moodtags:224}: Time to execute add_concepts.get_relevant_moodtags(homomorphism): 0:00:03.748051
