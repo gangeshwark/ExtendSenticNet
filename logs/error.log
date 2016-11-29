@@ -1,14 +1,10 @@
-2016-11-29 22:22:06,238 [ERROR] {get_new_concepts:129}: Time to execute add_concepts.get_new_concepts(): 0:00:00.000403
-2016-11-29 22:22:09,163 [ERROR] {get_relevant_moodtags:260}: Time to execute add_concepts.get_relevant_moodtags(homomorphism): 0:00:02.924639
-2016-11-29 22:22:09,167 [ERROR] {get_relevant_moodtags:260}: Time to execute add_concepts.get_relevant_moodtags(mustachio): 0:00:00.003929
-2016-11-29 22:22:09,175 [ERROR] {get_relevant_moodtags:260}: Time to execute add_concepts.get_relevant_moodtags(poplar): 0:00:00.007421
-2016-11-29 22:22:09,556 [ERROR] {get_relevant_moodtags:260}: Time to execute add_concepts.get_relevant_moodtags(long wave): 0:00:00.380798
-2016-11-29 22:22:09,597 [ERROR] {get_relevant_moodtags:260}: Time to execute add_concepts.get_relevant_moodtags(desert paintbrush): 0:00:00.040851
-2016-11-29 22:22:09,807 [ERROR] {get_relevant_moodtags:260}: Time to execute add_concepts.get_relevant_moodtags(blank endorsement): 0:00:00.209652
-2016-11-29 22:22:09,810 [ERROR] {get_relevant_moodtags:260}: Time to execute add_concepts.get_relevant_moodtags(woody): 0:00:00.002799
-2016-11-29 22:22:09,814 [ERROR] {get_relevant_moodtags:260}: Time to execute add_concepts.get_relevant_moodtags(underachieve): 0:00:00.003672
-2016-11-29 22:22:10,015 [ERROR] {get_relevant_moodtags:260}: Time to execute add_concepts.get_relevant_moodtags(bladder disorder): 0:00:00.201081
-2016-11-29 22:22:10,334 [ERROR] {get_relevant_moodtags:260}: Time to execute add_concepts.get_relevant_moodtags(positive pole): 0:00:00.318058
-2016-11-29 22:22:10,384 [ERROR] {get_relevant_moodtags:260}: Time to execute add_concepts.get_relevant_moodtags(a posteriori): 0:00:00.049816
-2016-11-29 22:22:10,624 [ERROR] {get_relevant_moodtags:260}: Time to execute add_concepts.get_relevant_moodtags(pied piper): 0:00:00.239585
-2016-11-29 22:22:11,096 [ERROR] {get_relevant_moodtags:260}: Time to execute add_concepts.get_relevant_moodtags(turn thumbs down): 0:00:00.471666
+2016-11-29 23:51:02,274 [ERROR] {get_new_concepts:128}: Time to execute add_concepts.get_new_concepts(): 0:00:00
+2016-11-29 23:51:05,244 [ERROR] {get_relevant_moodtags:260}: Time to execute add_concepts.get_relevant_moodtags(homomorphism): 0:00:02
+2016-11-29 23:51:05,327 [ERROR] {get_relevant_moodtags:260}: Time to execute add_concepts.get_relevant_moodtags(mustachio): 0:00:00
+2016-11-29 23:51:05,378 [ERROR] {get_relevant_moodtags:260}: Time to execute add_concepts.get_relevant_moodtags(poplar): 0:00:00
+2016-11-29 23:51:06,119 [ERROR] {get_relevant_moodtags:260}: Time to execute add_concepts.get_relevant_moodtags(long wave): 0:00:00
+2016-11-29 23:51:06,185 [ERROR] {get_relevant_moodtags:260}: Time to execute add_concepts.get_relevant_moodtags(desert paintbrush): 0:00:00
+2016-11-29 23:51:06,493 [ERROR] {get_relevant_moodtags:260}: Time to execute add_concepts.get_relevant_moodtags(blank endorsement): 0:00:00
+2016-11-29 23:51:06,497 [ERROR] {get_relevant_moodtags:260}: Time to execute add_concepts.get_relevant_moodtags(woody): 0:00:00
+2016-11-29 23:51:06,563 [ERROR] {get_relevant_moodtags:260}: Time to execute add_concepts.get_relevant_moodtags(underachieve): 0:00:00
+2016-11-29 23:51:06,875 [ERROR] {get_relevant_moodtags:260}: Time to execute add_concepts.get_relevant_moodtags(bladder disorder): 0:00:00

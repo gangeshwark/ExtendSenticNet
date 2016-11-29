@@ -40,6 +40,11 @@ current_pos_concepts = [" ".join(map(str, key.strip().split("_"))) for (key, val
 current_neg_concepts = [" ".join(map(str, key.strip().split("_"))) for (key, value) in senticnet.iteritems() if value[6]=='negative']
 
 
+def get_timestamp(seconds):
+	m, s = divmod(seconds, 60)
+	h, m = divmod(m, 60)
+	return "%d:%02d:%02d" % (h, m, s)
+
 def preprocess(word):
 	"""
 	Function to lemmatize a word
@@ -118,7 +123,9 @@ def get_new_concepts():
 		logging.error("Error: {0}".format(str(e)), exc_info=True)
 
 	logging.info("Number of pos_words: {0} ; neg_words: {1}".format(len(new_pos_words), len(new_neg_words)))
-	logging.error("Time to execute add_concepts.get_new_concepts(): {0}".format(datetime.now() - startTime))
+	delta = int((datetime.now() - startTime).total_seconds())
+
+	logging.error("Time to execute add_concepts.get_new_concepts(): {0}".format(get_timestamp(delta)))
 	return new_pos_words, new_neg_words
 
 
@@ -248,8 +255,9 @@ def get_relevant_moodtags(word, polarity):
 		mood_sorted = reversed(mood_sorted)
 		mood_sorted = list(mood_sorted)
 	logging.info(str(mood_sorted))
-	
-	logging.error("Time to execute add_concepts.get_relevant_moodtags({0}): {1}".format(word, datetime.now() - startTime))
+	delta = int((datetime.now() - startTime).total_seconds())
+
+	logging.error("Time to execute add_concepts.get_relevant_moodtags({0}): {1}".format(word, get_timestamp(delta)))
 	return mood_sorted[:2]
 
 
@@ -331,9 +339,8 @@ def get_semantics(word, polarity):
 		rank = list(rank)[:5]
 
 	logging.info(str(rank))
-
-	startTime = datetime.now()
-	logging.error("Time to execute add_concepts.get_semantics({0}): {1}".format(word, datetime.now() - startTime))
+	delta = int((datetime.now() - startTime).total_seconds())
+	logging.error("Time to execute add_concepts.get_semantics({0}): {1}".format(word, get_timestamp(delta)))
 	return rank
 
 
@@ -354,18 +361,20 @@ def main():
 	senticvector = {}
 	#polarity
 	if cal_pol:
+		i = 0
 		#python_data_file_positive = open('senticnet_new_pos_data.py', 'w+')
 		for word in pos_words:
+			i+=1
 			word = word.split(" ")
 			word = word[0]
 			word = re.split('_|-| ', word)
 			word = " ".join(word)
-			print "Polarity: 1", word
+			logging.info("Words: {0}; Polarity: {1}; Word: {2}".format(i, cal_pol, word))
 			final_moods = []
 			final_semantic = []
 			concept_moodtags = get_relevant_moodtags(word, 1)
 			concept_semantics = [' ', ' ', ' ', ' ', ' ']#get_semantics(word, 1)
-			concept_semantics = get_semantics(word, 1)
+			#concept_semantics = get_semantics(word, 1)
 			for mood in concept_moodtags:
 				final_moods.append("#" + mood[0])
 
@@ -379,18 +388,20 @@ def main():
 				string = string.format(word, vector[0], vector[1], vector[2], vector[3], vector[4], vector[5], vector[6], vector[7])
 				python_data_file_positive.write(string)
 	else:
+		i=0
 		#python_data_file_negative = open('senticnet_new_neg_data.py', 'w+')
 		for word in neg_words:
+			i+=1
 			word = word.split(" ")
 			word = word[0]
 			word = re.split('_|-| ', word)
 			word = " ".join(word)
-			print "Polarity: -1", word
+			logging.info("Words: {0}; Polarity: {1}; Word: {2}".format(i, cal_pol, word))
 			final_moods = []
 			final_semantic = []
 			concept_moodtags = get_relevant_moodtags(word, -1)
 			concept_semantics = [' ', ' ', ' ', ' ', ' ']#get_semantics(word,-1)
-			concept_semantics = get_semantics(word,-1)
+			#concept_semantics = get_semantics(word,-1)
 			for mood in concept_moodtags:
 				final_moods.append("#" + mood[0])
 
