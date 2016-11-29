@@ -99,12 +99,8 @@ def get_new_concepts():
 	try:
 		with open(OUTPUT_BASE_PATH + '/new_positive_words.txt', 'r') as posi_file:
 			new_pos_words = []
-			i = 0
 			for word in posi_file:
-				if i == 300:
-					break
 				new_pos_words.append(word.strip())
-				i+=1
 	except IOError, e:
 		logging.error("File I/O error: {0}".format(str(e)), exc_info=True)
 	except Exception, e:
@@ -114,11 +110,7 @@ def get_new_concepts():
 	try:
 		with open(OUTPUT_BASE_PATH + '/new_negative_words.txt', 'r') as neg_file:
 			new_neg_words = []
-			i=0
 			for word in neg_file:
-				if i == 300:
-					break
-				i+=1
 				new_neg_words.append(word.strip())
 	except IOError, e:
 		logging.error("File I/O error: {0}".format(str(e)), exc_info=True)
@@ -373,7 +365,7 @@ def main():
 			final_semantic = []
 			concept_moodtags = get_relevant_moodtags(word, 1)
 			concept_semantics = [' ', ' ', ' ', ' ', ' ']#get_semantics(word, 1)
-			#concept_semantics = get_semantics(word, 1)
+			concept_semantics = get_semantics(word, 1)
 			for mood in concept_moodtags:
 				final_moods.append("#" + mood[0])
 
@@ -398,7 +390,7 @@ def main():
 			final_semantic = []
 			concept_moodtags = get_relevant_moodtags(word, -1)
 			concept_semantics = [' ', ' ', ' ', ' ', ' ']#get_semantics(word,-1)
-			#concept_semantics = get_semantics(word,-1)
+			concept_semantics = get_semantics(word,-1)
 			for mood in concept_moodtags:
 				final_moods.append("#" + mood[0])
 
