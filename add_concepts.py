@@ -323,7 +323,7 @@ def main():
 
 			vector = final_moods + ['positive'] + final_semantic
 			senticvector[word] = vector
-			with open('senticnet_new_pos_data.py', 'w+') as python_data_file_positive:
+			with open('senticnet_new_pos_data.py', 'a') as python_data_file_positive:
 				string = "senticnet['{0}'] = ['{1}', '{2}', '{3}', '{4}', '{5}', '{6}', '{7}', '{8}']\n"
 				string = string.format(word, vector[0], vector[1], vector[2], vector[3], vector[4], vector[5], vector[6], vector[7])
 				python_data_file_positive.write(string)
@@ -347,7 +347,7 @@ def main():
 
 			vector = final_moods + ['negative'] + final_semantic
 			senticvector[word] = vector
-			with open('senticnet_new_neg_data.py', 'w+') as python_data_file_negative:
+			with open('senticnet_new_neg_data.py', 'a') as python_data_file_negative:
 				string = "senticnet['{0}'] = ['{1}', '{2}', '{3}', '{4}', '{5}', '{6}', '{7}', '{8}']\n"
 				string = string.format(word, vector[0], vector[1], vector[2], vector[3], vector[4], vector[5], vector[6], vector[7])
 				python_data_file_negative.write(string)
@@ -359,7 +359,7 @@ def main():
 		string = "senticnet['{0}'] = ['{1}', '{2}', '{3}','{4}', '{5}', '{6}', '{7}', '{8}']\n"
 		string = string.format(key, value[0], value[1], value[2], value[3], value[4], value[5], value[6], value[7])
 		python_data += string
-	python_data_file = open('senticnet_new_data.py', 'w+')
+	python_data_file = open('senticnet_new_data.py', 'a')
 	python_data_file.write(python_data)
 	logging.error("Time to execute add_concepts.main(): {0}".format(datetime.now() - startTime))
 	"""
