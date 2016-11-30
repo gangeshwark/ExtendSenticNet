@@ -36,6 +36,7 @@ ml = MyLemmatizer()
 
 #initialize_logger("logs")
 
+#get the current positive and negative words.
 current_pos_concepts = [" ".join(map(str, key.strip().split("_"))) for (key, value) in senticnet.iteritems() if value[6]=='positive']
 current_neg_concepts = [" ".join(map(str, key.strip().split("_"))) for (key, value) in senticnet.iteritems() if value[6]=='negative']
 
